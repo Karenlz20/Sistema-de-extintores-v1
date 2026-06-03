@@ -1,0 +1,79 @@
+@SistemaExtintores_HostAddress = http://localhost:5057
+
+GET {{SistemaExtintores_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+@host = http://localhost:5057
+
+### Agregar cilindro
+POST {{host}}/Inventario/agregar-cilindro
+Content-Type: application/json
+
+{
+  "nroSerie": "CIL-005",
+  "tipoAgente": "PQS",
+  "capacidad": 6,
+  "precioUnitario": 150.0
+}
+
+### Agregar insumo
+POST {{host}}/Inventario/agregar-insumo
+Content-Type: application/json
+
+{
+  "nombre": "Válvula pequeña",
+  "unidad": "unidad",
+  "stock": 15,
+  "puntoReorden": 5
+}
+
+### Agregar cliente persona
+POST {{host}}/Clientes/agregar-persona
+Content-Type: application/json
+
+{
+  "nombreCompleto": "Pedro Suarez",
+  "ci": "9876543",
+  "telefono": "78901234",
+  "correo": "pedro@gmail.com",
+  "direccion": "Av. Alemana 100"
+}
+
+### Crear venta
+POST {{host}}/Ventas/crear-venta
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "cajera": "Ana Flores",
+  "descuento": 0
+}
+
+### Agregar item a venta
+POST {{host}}/Ventas/agregar-item/2
+Content-Type: application/json
+
+{
+  "nroSerie": "CIL-001",
+  "tipoAgente": "PQS",
+  "capacidad": 6,
+  "cantidad": 1,
+  "precioUnitario": 150.0
+}
+
+### Confirmar venta
+PUT {{host}}/Ventas/confirmar-venta/2
+
+### Ver factura
+GET {{host}}/Ventas/factura/2
+
+### Agregar recarga a extintor
+POST {{host}}/Extintores/agregar-recarga/1
+Content-Type: application/json
+
+{
+  "agenteUsado": "PQS",
+  "tecnico": "Carlos Mendez",
+  "observaciones": "Recarga anual"
+}

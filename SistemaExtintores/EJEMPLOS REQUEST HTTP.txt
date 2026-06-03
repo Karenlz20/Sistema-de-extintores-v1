@@ -1,0 +1,60 @@
+--------------------------------------------------------
+PUT {{host}}/Extintores/actualizar-extintor/2
+Content-Type: application/json /* <<<<---- NO OLVIDAR PONERLO COMPLETO, siempre poner cuando se tiene "[FromBody]" en el controller,
+                                                                    ya que eso indica que el contenido se encuentra en el cuerpo de
+                                                                    la request  */
+
+{
+  "nroSerie": "EXT-008",
+  "tipoAgente": "PQS",
+  "capacidad": 5,
+  "fechaFabricacion": "2026-05-20",            // YYYY-MM-DD
+  "fechaUltimaCarga": "2026-02-20",            // YYY-MM-DD
+  "fechaVencimiento": "2027-05-20",            // YYYY-MM-DD
+  "clienteId": 6
+}
+
+--------------------------------------------------------
+POST {{host}}/Clientes/agregar-empresa
+Content-Type: application/json
+{
+"razonSocial": "BANCO FIE SA",
+"nit": "26549827",
+"nombreContacto": "Fernando Jiménez",
+"telefono": "654823",
+"correo": "bancofie@gmail.com",
+"direccion": "Av. San Martin"
+}
+
+--------------------------------------------------------
+PUT {{host}}/Inventario/actualizar-stock-insumo/4
+Content-Type: application/json
+
+25  //si no hay más que un solo campo, no se ponen {} PERO EL CONTENT-TYPE SIEMPRE QUE HAYA FROMBODY T-T no olvidar
+
+--------------------------------------------------------
+GET {{host}}/Extintores/por-estado/Vigente
+
+--------------------------------------------------------
+PUT {{host}}/Inventario/actualizar-insumo/10
+Content-Type: application/json
+{
+"nombre": "Agente PQS",
+"unidad": "kg",
+"puntoReorden": 25 
+}
+
+--------------------------------------------------------
+//Tomar en cuenta los campos que se llenan automáticamente en los métodos (en este caso, el id y el marcarlo disponible)
+POST {{host}}/Inventario/agregar-cilindro
+Content-Type: application/json
+{
+"nroSerie": "CIL-008",
+"tipoAgente": "PQS",
+"capacidad": 8,
+"precioUnitario": 200,
+}
+
+
+--------------------------------------------------------
+DELETE {{host}}/Inventario/eliminar-insumo/8

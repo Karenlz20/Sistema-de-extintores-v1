@@ -7,13 +7,10 @@ public class GestionUsuarios
 {
     private static List<Usuario> _usuarios = new List<Usuario>
     {
-        new Usuario(1, "jPerez01", "Abc123", RolUsuario.Cliente, null, 1),
-        new Usuario(2, "MLopez20", "Abc123", RolUsuario.Cliente, null, 2),
-        new Usuario(3, "Seguridad.SRL", "Abc123", RolUsuario.Cliente, null, 3),
-        new Usuario(4, "Cajera1",  "Abc123", RolUsuario.Cajero, "Ana Flores", null),
-        new Usuario(5, "Tecnico1",  "Abc123", RolUsuario.Tecnico, "Carlos Mendez", null),
+        new Usuario(1, "admin", "Abc123", RolUsuario.Administrador, "Administrador Principal", null),
+        new Usuario(2, "Cajera1", "Abc123", RolUsuario.Cajera, "Ana Flores", null),
     };
-    private static int _contadorId = 6;
+    private static int _contadorId = 3;
 
     private GestionClientes _gestionClientes;
 

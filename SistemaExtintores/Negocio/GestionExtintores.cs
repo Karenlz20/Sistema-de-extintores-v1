@@ -25,9 +25,9 @@ namespace SistemaExtintores.Negocio
 
         public Extintor ObtenerPorId(int id)
         {
-            foreach (var extintor in _extintores)
+            foreach (Extintor extintor in _extintores)
             {
-                if (extintor.GetId() == id)
+                if (extintor.Id == id)
                     return extintor;
             }
             return null;
@@ -36,9 +36,9 @@ namespace SistemaExtintores.Negocio
         public List<Extintor> ObtenerPorCliente(int clienteId)
         {
             List<Extintor> resultado = new List<Extintor>();
-            foreach (var extintor in _extintores)
+            foreach (Extintor extintor in _extintores)
             {
-                if (extintor.GetClienteId() == clienteId)
+                if (extintor.ClienteId == clienteId)
                     resultado.Add(extintor);
             }
             return resultado;
@@ -47,7 +47,7 @@ namespace SistemaExtintores.Negocio
         public List<Extintor> ObtenerPorEstado(EstadoVigencia estado)
         {
             List<Extintor> resultado = new List<Extintor>();
-            foreach (var extintor in _extintores)
+            foreach (Extintor extintor in _extintores)
             {
                 if (extintor.ObtenerEstado() == estado)
                     resultado.Add(extintor);
@@ -57,31 +57,31 @@ namespace SistemaExtintores.Negocio
 
         public Extintor Agregar(Extintor extintor)
         {
-            extintor.SetId(_contadorId++);
+            extintor.Id = _contadorId++;
             HojaDeVida hoja = new HojaDeVida();
-            hoja.SetId(_contadorHojaVida++);
-            hoja.SetFechaRegistroInicial(DateTime.Now);
-            extintor.SetHojaDeVida(hoja);
+            hoja.Id = _contadorHojaVida++;
+            hoja.FechaRegistroInicial = DateTime.Now;
+            extintor.HojaDeVida = hoja;
             _extintores.Add(extintor);
             return extintor;
         }
 
         public Extintor Actualizar(int id, Extintor extintorActualizado)
         {
-            var existente = ObtenerPorId(id);
+            Extintor existente = ObtenerPorId(id);
             if (existente == null) return null;
 
-            existente.SetTipoAgente(extintorActualizado.GetTipoAgente());
-            existente.SetCapacidad(extintorActualizado.GetCapacidad());
-            existente.SetFechaUltimaCarga(extintorActualizado.GetFechaUltimaCarga());
-            existente.SetFechaVencimiento(extintorActualizado.GetFechaVencimiento());
+            existente.TipoAgente = extintorActualizado.TipoAgente;
+            existente.Capacidad = extintorActualizado.Capacidad;
+            existente.FechaUltimaCarga = extintorActualizado.FechaUltimaCarga;
+            existente.FechaVencimiento = extintorActualizado.FechaVencimiento;
 
             return existente;
         }
 
         public bool Eliminar(int id)
         {
-            var extintor = ObtenerPorId(id);
+            Extintor extintor = ObtenerPorId(id);
             if (extintor == null) return false;
 
             _extintores.Remove(extintor);
@@ -90,25 +90,22 @@ namespace SistemaExtintores.Negocio
 
         public Extintor AgregarRecarga(int extintorId, Recarga recarga)
         {
-            var extintor = ObtenerPorId(extintorId);
+            Extintor extintor = ObtenerPorId(extintorId);
             if (extintor == null) return null;
 
-            foreach (var insumo in _gestionInventario.ObtenerInsumos())
+            foreach (InsumoInventario insumo in _gestionInventario.ObtenerInsumos())
             {
-                if (insumo.GetNombre() == recarga.GetAgenteUsado())
+                if (insumo.Nombre == recarga.AgenteUsado)
                 {
-                    _gestionInventario.ActualizarStockInsumo(
-                        insumo.GetId(),
-                        -extintor.GetCapacidad()
-                    );
+                    _gestionInventario.ActualizarStockInsumo(insumo.Id, -extintor.Capacidad);
                     break;
                 }
             }
 
-            recarga.SetId(_contadorRecarga++);
-            recarga.SetFecha(DateTime.Now);
-            extintor.GetHojaDeVida().AgregarRecarga(recarga);
-            extintor.SetFechaUltimaCarga(recarga.GetFecha());
+            recarga.Id = _contadorRecarga++;
+            recarga.Fecha = DateTime.Now;
+            extintor.HojaDeVida.AgregarRecarga(recarga);
+            extintor.FechaUltimaCarga = recarga.Fecha;
 
             return extintor;
         }

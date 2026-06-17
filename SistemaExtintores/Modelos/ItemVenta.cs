@@ -2,20 +2,11 @@ namespace SistemaExtintores.Modelos
 {
     public abstract class ItemVenta
     {
-        private int _id;
-        private int _cantidad;
-        private double _precioUnitario;
+        public int Id { get; set; }
+        public int Cantidad { get; set; }
+        public double PrecioUnitario { get; set; }
 
-        public int GetId() { return _id; }
-        public void SetId(int id) { _id = id; }
-
-        public int GetCantidad() { return _cantidad; }
-        public void SetCantidad(int cantidad) { _cantidad = cantidad; }
-
-        public double GetPrecioUnitario() { return _precioUnitario; }
-        public void SetPrecioUnitario(double precio) { _precioUnitario = precio; }
-
-        public double ObtenerSubtotal() { return _cantidad * _precioUnitario; }
+        public double ObtenerSubtotal() { return Cantidad * PrecioUnitario; }
         public abstract string ObtenerDescripcion();
     }
 }

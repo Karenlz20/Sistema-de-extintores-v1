@@ -2,14 +2,11 @@ namespace SistemaExtintores.Modelos
 {
     public class RecargaItem : ItemVenta
     {
-        private string _nroSerieExtintor;
-
-        public string GetNroSerieExtintor() { return _nroSerieExtintor; }
-        public void SetNroSerieExtintor(string nroSerie) { _nroSerieExtintor = nroSerie; }
+        public string NroSerieExtintor { get; set; }
 
         public override string ObtenerDescripcion()
         {
-            return "Recarga extintor N° " + _nroSerieExtintor;
+            return "Recarga extintor N° " + NroSerieExtintor;
         }
     }
 }

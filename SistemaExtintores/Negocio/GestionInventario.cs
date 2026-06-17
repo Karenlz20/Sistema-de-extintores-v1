@@ -30,9 +30,9 @@ namespace SistemaExtintores.Negocio
         public List<CilindroInventario> ObtenerCilindrosDisponibles()
         {
             List<CilindroInventario> resultado = new List<CilindroInventario>();
-            foreach (var cilindro in _cilindros)
+            foreach (CilindroInventario cilindro in _cilindros)
             {
-                if (cilindro.GetDisponible())
+                if (cilindro.Disponible)
                     resultado.Add(cilindro);
             }
             return resultado;
@@ -41,9 +41,9 @@ namespace SistemaExtintores.Negocio
         public List<CilindroInventario> ObtenerCilindrosVendidos()
         {
             List<CilindroInventario> resultado = new List<CilindroInventario>();
-            foreach (var cilindro in _cilindros)
+            foreach (CilindroInventario cilindro in _cilindros)
             {
-                if (!cilindro.GetDisponible())
+                if (!cilindro.Disponible)
                     resultado.Add(cilindro);
             }
             return resultado;
@@ -51,9 +51,9 @@ namespace SistemaExtintores.Negocio
 
         public CilindroInventario ObtenerCilindroPorId(int id)
         {
-            foreach (var cilindro in _cilindros)
+            foreach (CilindroInventario cilindro in _cilindros)
             {
-                if (cilindro.GetId() == id)
+                if (cilindro.Id == id)
                     return cilindro;
             }
             return null;
@@ -61,9 +61,9 @@ namespace SistemaExtintores.Negocio
 
         public CilindroInventario ObtenerCilindroPorNroSerie(string nroSerie)
         {
-            foreach (var cilindro in _cilindros)
+            foreach (CilindroInventario cilindro in _cilindros)
             {
-                if (cilindro.GetNroSerie() == nroSerie)
+                if (cilindro.NroSerie == nroSerie)
                     return cilindro;
             }
             return null;
@@ -71,7 +71,7 @@ namespace SistemaExtintores.Negocio
 
         public CilindroInventario AgregarCilindro(CilindroInventario cilindro)
         {
-            cilindro.SetId(_contadorCilindroId++);
+            cilindro.Id = _contadorCilindroId++;
             cilindro.MarcarDisponible();
             _cilindros.Add(cilindro);
             return cilindro;
@@ -79,8 +79,8 @@ namespace SistemaExtintores.Negocio
 
         public CilindroInventario MarcarVendido(int id)
         {
-            var cilindro = ObtenerCilindroPorId(id);
-            if (cilindro == null || !cilindro.GetDisponible()) return null;
+            CilindroInventario cilindro = ObtenerCilindroPorId(id);
+            if (cilindro == null || !cilindro.Disponible) return null;
 
             cilindro.MarcarVendido();
             return cilindro;
@@ -88,7 +88,7 @@ namespace SistemaExtintores.Negocio
 
         public bool EliminarCilindro(int id)
         {
-            var cilindro = ObtenerCilindroPorId(id);
+            CilindroInventario cilindro = ObtenerCilindroPorId(id);
             if (cilindro == null) return false;
 
             _cilindros.Remove(cilindro);
@@ -102,7 +102,7 @@ namespace SistemaExtintores.Negocio
         public List<InsumoInventario> ObtenerInsumosBajoReorden()
         {
             List<InsumoInventario> resultado = new List<InsumoInventario>();
-            foreach (var insumo in _insumos)
+            foreach (InsumoInventario insumo in _insumos)
             {
                 if (insumo.RequiereReorden())
                     resultado.Add(insumo);
@@ -112,9 +112,9 @@ namespace SistemaExtintores.Negocio
 
         public InsumoInventario ObtenerInsumoPorId(int id)
         {
-            foreach (var insumo in _insumos)
+            foreach (InsumoInventario insumo in _insumos)
             {
-                if (insumo.GetId() == id)
+                if (insumo.Id == id)
                     return insumo;
             }
             return null;
@@ -122,14 +122,14 @@ namespace SistemaExtintores.Negocio
 
         public InsumoInventario AgregarInsumo(InsumoInventario insumo)
         {
-            insumo.SetId(_contadorInsumoId++);
+            insumo.Id = _contadorInsumoId++;
             _insumos.Add(insumo);
             return insumo;
         }
 
         public InsumoInventario ActualizarStockInsumo(int id, double cantidad)
         {
-            var insumo = ObtenerInsumoPorId(id);
+            InsumoInventario insumo = ObtenerInsumoPorId(id);
             if (insumo == null) return null;
 
             insumo.ActualizarStock(cantidad);
@@ -138,19 +138,19 @@ namespace SistemaExtintores.Negocio
 
         public InsumoInventario ActualizarInsumo(int id, InsumoInventario insumoActualizado)
         {
-            var existente = ObtenerInsumoPorId(id);
+            InsumoInventario existente = ObtenerInsumoPorId(id);
             if (existente == null) return null;
 
-            existente.SetNombre(insumoActualizado.GetNombre());
-            existente.SetUnidad(insumoActualizado.GetUnidad());
-            existente.SetPuntoReorden(insumoActualizado.GetPuntoReorden());
+            existente.Nombre = insumoActualizado.Nombre;
+            existente.Unidad = insumoActualizado.Unidad;
+            existente.PuntoReorden = insumoActualizado.PuntoReorden;
 
             return existente;
         }
 
         public bool EliminarInsumo(int id)
         {
-            var insumo = ObtenerInsumoPorId(id);
+            InsumoInventario insumo = ObtenerInsumoPorId(id);
             if (insumo == null) return false;
 
             _insumos.Remove(insumo);

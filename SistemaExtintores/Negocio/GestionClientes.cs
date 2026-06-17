@@ -4,7 +4,6 @@ namespace SistemaExtintores.Negocio
 {
     public class GestionClientes
     {
-        //lista estátida: cada vez que se cree un nuevo GestionClientes, se comparte la misma lista
         private static List<Cliente> _clientes = new List<Cliente>
         {
             new ClientePersona(1, "Juan Pérez", "1234567", "76543210", "juan@gmail.com", "Av. Cañoto 123"),
@@ -17,9 +16,9 @@ namespace SistemaExtintores.Negocio
 
         public Cliente ObtenerPorId(int id)
         {
-            foreach (var cliente in _clientes)
+            foreach (Cliente cliente in _clientes)
             {
-                if (cliente.GetId() == id)
+                if (cliente.Id == id)
                     return cliente;
             }
             return null;
@@ -27,26 +26,26 @@ namespace SistemaExtintores.Negocio
 
         public Cliente Agregar(Cliente cliente)
         {
-            cliente.SetId(_contadorId++);
+            cliente.Id = _contadorId++;
             _clientes.Add(cliente);
             return cliente;
         }
 
         public Cliente Actualizar(int id, Cliente clienteActualizado)
         {
-            var existente = ObtenerPorId(id);
+            Cliente existente = ObtenerPorId(id);
             if (existente == null) return null;
 
-            existente.SetTelefono(clienteActualizado.GetTelefono());
-            existente.SetCorreo(clienteActualizado.GetCorreo());
-            existente.SetDireccion(clienteActualizado.GetDireccion());
+            existente.Telefono = clienteActualizado.Telefono;
+            existente.Correo = clienteActualizado.Correo;
+            existente.Direccion = clienteActualizado.Direccion;
 
             return existente;
         }
 
         public bool Eliminar(int id)
         {
-            var cliente = ObtenerPorId(id);
+            Cliente cliente = ObtenerPorId(id);
             if (cliente == null) return false;
 
             cliente.Desactivar();

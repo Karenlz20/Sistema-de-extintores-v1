@@ -24,9 +24,9 @@ namespace SistemaExtintores.Negocio
         public List<Venta> ObtenerPorCliente(int clienteId)
         {
             List<Venta> resultado = new List<Venta>();
-            foreach (var venta in _ventas)
+            foreach (Venta venta in _ventas)
             {
-                if (venta.GetClienteId() == clienteId)
+                if (venta.ClienteId == clienteId)
                     resultado.Add(venta);
             }
             return resultado;
@@ -34,9 +34,9 @@ namespace SistemaExtintores.Negocio
 
         public Venta ObtenerPorId(int id)
         {
-            foreach (var venta in _ventas)
+            foreach (Venta venta in _ventas)
             {
-                if (venta.GetId() == id)
+                if (venta.Id == id)
                     return venta;
             }
             return null;
@@ -44,16 +44,16 @@ namespace SistemaExtintores.Negocio
 
         public Venta CrearVenta(Venta venta)
         {
-            venta.SetId(_contadorId++);
-            venta.SetFecha(DateTime.Now);
+            venta.Id = _contadorId++;
+            venta.Fecha = DateTime.Now;
             _ventas.Add(venta);
             return venta;
         }
 
         public Venta AgregarItem(int ventaId, ItemVenta item)
         {
-            var venta = ObtenerPorId(ventaId);
-            if (venta == null || venta.GetConfirmada()) return null;
+            Venta venta = ObtenerPorId(ventaId);
+            if (venta == null || venta.Confirmada) return null;
 
             venta.AgregarItem(item);
             return venta;
@@ -61,28 +61,29 @@ namespace SistemaExtintores.Negocio
 
         public Venta ConfirmarVenta(int ventaId)
         {
-            var venta = ObtenerPorId(ventaId);
-            if (venta == null || venta.GetConfirmada()) return null;
+            Venta venta = ObtenerPorId(ventaId);
+            if (venta == null || venta.Confirmada) return null;
 
-            foreach (var item in venta.GetItems())
+            foreach (ItemVenta item in venta.Items)
             {
-                if (item is ExtintorItem extItem)
+                if (item is ExtintorItem)
                 {
-                    var cilindro = _gestionInventario.ObtenerCilindroPorNroSerie(extItem.GetNroSerie());
+                    ExtintorItem extItem = (ExtintorItem)item;
+                    CilindroInventario cilindro = _gestionInventario.ObtenerCilindroPorNroSerie(extItem.NroSerie);
                     if (cilindro != null)
                     {
-                        _gestionInventario.MarcarVendido(cilindro.GetId());
+                        _gestionInventario.MarcarVendido(cilindro.Id);
 
                         Extintor nuevoExtintor = new Extintor();
-                        nuevoExtintor.SetNroSerie(cilindro.GetNroSerie());
-                        nuevoExtintor.SetTipoAgente(cilindro.GetTipoAgente());
-                        nuevoExtintor.SetCapacidad(cilindro.GetCapacidad());
-                        nuevoExtintor.SetFechaFabricacion(DateTime.Now);
-                        nuevoExtintor.SetFechaUltimaCarga(DateTime.Now);
-                        nuevoExtintor.SetFechaVencimiento(DateTime.Now.AddYears(1));
-                        nuevoExtintor.SetClienteId(venta.GetClienteId());
-                        nuevoExtintor.SetSucursalId(venta.GetSucursalId());
-                        nuevoExtintor.SetCilindroInventarioId(cilindro.GetId());
+                        nuevoExtintor.NroSerie = cilindro.NroSerie;
+                        nuevoExtintor.TipoAgente = cilindro.TipoAgente;
+                        nuevoExtintor.Capacidad = cilindro.Capacidad;
+                        nuevoExtintor.FechaFabricacion = DateTime.Now;
+                        nuevoExtintor.FechaUltimaCarga = DateTime.Now;
+                        nuevoExtintor.FechaVencimiento = DateTime.Now.AddYears(1);
+                        nuevoExtintor.ClienteId = venta.ClienteId;
+                        nuevoExtintor.SucursalId = venta.SucursalId;
+                        nuevoExtintor.CilindroInventarioId = cilindro.Id;
 
                         _gestionExtintores.Agregar(nuevoExtintor);
                     }

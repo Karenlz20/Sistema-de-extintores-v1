@@ -25,7 +25,7 @@ namespace SistemaExtintores.Negocio
             int proximos = 0;
             int fueraNorma = 0;
 
-            foreach (var e in extintores)
+            foreach (Extintor e in extintores)
             {
                 if (e.ObtenerEstado() == EstadoVigencia.Vigente) vigentes++;
                 else if (e.ObtenerEstado() == EstadoVigencia.ProximoAVencer) proximos++;
@@ -48,17 +48,17 @@ namespace SistemaExtintores.Negocio
         {
             List<object> resultado = new List<object>();
 
-            foreach (var e in _gestionExtintores.ObtenerTodos())
+            foreach (Extintor e in _gestionExtintores.ObtenerTodos())
             {
                 if (e.ObtenerEstado() != EstadoVigencia.Vigente)
                 {
                     resultado.Add(new
                     {
-                        ExtintorId = e.GetId(),
-                        NroSerie = e.GetNroSerie(),
+                        ExtintorId = e.Id,
+                        NroSerie = e.NroSerie,
                         Estado = e.ObtenerEstado().ToString(),
-                        ClienteId = e.GetClienteId(),
-                        FechaVencimiento = e.GetFechaVencimiento()
+                        ClienteId = e.ClienteId,
+                        FechaVencimiento = e.FechaVencimiento
                     });
                 }
             }

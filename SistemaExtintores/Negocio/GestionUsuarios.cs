@@ -1,7 +1,7 @@
 using SistemaExtintores.Modelos;
 
 namespace SistemaExtintores.Negocio;
- 
+
 
 public class GestionUsuarios
 {
@@ -18,7 +18,7 @@ public class GestionUsuarios
     {
         _gestionClientes = gestionClientes;
     }
-    
+
     public List<Usuario> ObtenerTodos()
     {
         return _usuarios;
@@ -26,44 +26,63 @@ public class GestionUsuarios
 
     public Usuario ObtenerPorId(int id)
     {
-        foreach (var usuario in _usuarios)
+        foreach (Usuario usuario in _usuarios)
         {
-            if (usuario.GetId() == id)
+            if (usuario.Id == id)
             {
                 return usuario;
             }
         }
         return null;
     }
-    
+
+    public Usuario ObtenerPorNombreUsuario(string nombreUsuario)
+    {
+        foreach (Usuario usuario in _usuarios)
+        {
+            if (usuario.NombreUsuario == nombreUsuario)
+            {
+                return usuario;
+            }
+        }
+        return null;
+    }
+
+    public Usuario ValidarCredenciales(string nombreUsuario, string password)
+    {
+        Usuario usuario = ObtenerPorNombreUsuario(nombreUsuario);
+        if (usuario == null) return null;
+        if (!usuario.Activo) return null;
+        if (usuario.Password != password) return null;
+        return usuario;
+    }
+
     public Usuario Agregar(Usuario usuario)
     {
-        //si el idCliente no es nulo, hay que verificar que ese id sea válido
-        if (usuario.GetClienteId() != null)
+        if (usuario.ClienteId != null)
         {
-            var cliente = _gestionClientes.ObtenerPorId(usuario.GetClienteId().Value);
-            //si no es un id válido, se termina
+            Cliente cliente = _gestionClientes.ObtenerPorId(usuario.ClienteId.Value);
             if (cliente == null) return null;
         }
-        
-        usuario.SetId(_contadorId++);
+
+        usuario.Id = _contadorId++;
         _usuarios.Add(usuario);
         return usuario;
     }
 
     public Usuario Actualizar(int id, Usuario usuarioActualizado)
     {
-        var existente = ObtenerPorId(id);
+        Usuario existente = ObtenerPorId(id);
         if (existente == null) return null;
 
-        existente.SetNombreUsuario(usuarioActualizado.GetNombreUsuario());
-        
+        existente.NombreUsuario = usuarioActualizado.NombreUsuario;
+
         return existente;
     }
 
     public bool Eliminar(int id)
     {
-        var usuario = ObtenerPorId(id);
+        Usuario usuario = ObtenerPorId(id);
         if (usuario == null) return false;
 
         usuario.Desactivar();

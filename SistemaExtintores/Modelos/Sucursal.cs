@@ -2,30 +2,25 @@ namespace SistemaExtintores.Modelos
 {
     public class Sucursal
     {
-        private int _id;
-        private string _nombre;
-        private string _direccion;
-        private string _telefono;
-        private bool _activa = true;
-        private int _clienteEmpresaId;
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public string Direccion { get; set; }
+        public string Telefono { get; set; }
+        public bool Activa { get; set; } = true;
+        public int ClienteEmpresaId { get; set; }
 
-        public int GetId() { return _id; }
-        public void SetId(int id) { _id = id; }
+        public Sucursal() { }
 
-        public string GetNombre() { return _nombre; }
-        public void SetNombre(string nombre) { _nombre = nombre; }
+        public Sucursal(int id, string nombre, string direccion, string telefono, int clienteEmpresaId)
+        {
+            Id = id;
+            Nombre = nombre;
+            Direccion = direccion;
+            Telefono = telefono;
+            ClienteEmpresaId = clienteEmpresaId;
+        }
 
-        public string GetDireccion() { return _direccion; }
-        public void SetDireccion(string direccion) { _direccion = direccion; }
-
-        public string GetTelefono() { return _telefono; }
-        public void SetTelefono(string telefono) { _telefono = telefono; }
-
-        public bool GetActiva() { return _activa; }
-        public void Activar() { _activa = true; }
-        public void Desactivar() { _activa = false; }
-
-        public int GetClienteEmpresaId() { return _clienteEmpresaId; }
-        public void SetClienteEmpresaId(int id) { _clienteEmpresaId = id; }
+        public void Activar() { Activa = true; }
+        public void Desactivar() { Activa = false; }
     }
 }

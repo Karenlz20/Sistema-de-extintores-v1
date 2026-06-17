@@ -12,8 +12,10 @@ public class UsuariosController : ControllerBase
     
     public UsuariosController()
     {
-        var _gestionClientes = new GestionClientes();
-        _gestionUsuarios = new GestionUsuarios(_gestionClientes);
+        GestionInventario gestionInventario = new GestionInventario();
+        GestionExtintores gestionExtintores = new GestionExtintores(gestionInventario);
+        GestionClientes gestionClientes = new GestionClientes(gestionExtintores);
+        _gestionUsuarios = new GestionUsuarios(gestionClientes);
     }
 
     [HttpGet("lista-usuarios")]
@@ -41,8 +43,19 @@ public class UsuariosController : ControllerBase
     }
 
     [HttpDelete("eliminar-usuario/{id}")]
-    public bool Eliminar(int id)
+    public object Eliminar(int id, [FromQuery] int usuarioActualId)
     {
-        return _gestionUsuarios.Eliminar(id);
+        if (id == usuarioActualId)
+            return BadRequest("No podés desactivarte a vos mismo.");
+
+        Usuario usuario = _gestionUsuarios.ObtenerPorId(id);
+        if (usuario == null)
+            return BadRequest("Usuario no encontrado.");
+
+        bool ok = _gestionUsuarios.Eliminar(id, usuarioActualId);
+        if (!ok)
+            return BadRequest("No se pudo desactivar el usuario.");
+
+        return Ok(new { Mensaje = "Usuario desactivado correctamente." });
     }
 }

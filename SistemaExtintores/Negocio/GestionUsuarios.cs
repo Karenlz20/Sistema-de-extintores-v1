@@ -80,8 +80,11 @@ public class GestionUsuarios
         return existente;
     }
 
-    public bool Eliminar(int id)
+    public bool Eliminar(int id, int usuarioActualId)
     {
+        // HU-03: el administrador no puede desactivarse a sí mismo
+        if (id == usuarioActualId) return false;
+
         Usuario usuario = ObtenerPorId(id);
         if (usuario == null) return false;
 

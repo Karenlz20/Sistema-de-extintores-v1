@@ -12,7 +12,12 @@ namespace SistemaExtintores.Negocio
         };
         private static int _contadorId = 4;
         private static int _contadorSucursalId = 1;
+        private GestionExtintores _gestionExtintores;
 
+        public GestionClientes(GestionExtintores gestionExtintores)
+        {
+            _gestionExtintores = gestionExtintores;
+        }
         public List<Cliente> ObtenerTodos() { return _clientes; }
 
         // ── Sucursales (HU-06) ──
@@ -120,6 +125,13 @@ namespace SistemaExtintores.Negocio
         {
             Cliente cliente = ObtenerPorId(id);
             if (cliente == null) return false;
+
+            List<Extintor> extintores = _gestionExtintores.ObtenerPorCliente(id);
+            foreach (Extintor extintor in extintores)
+            {
+                if (extintor.ObtenerEstado() != EstadoVigencia.FueraDeNorma)
+                    return false;
+            }
 
             cliente.Desactivar();
             return true;

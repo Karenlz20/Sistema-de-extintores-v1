@@ -11,11 +11,12 @@ public class DashboardController : ControllerBase
 
     public DashboardController()
     {
-        var gestionInventario = new GestionInventario();
-        var gestionExtintores = new GestionExtintores(gestionInventario);
+        GestionInventario gestionInventario = new GestionInventario();
+        GestionExtintores gestionExtintores = new GestionExtintores(gestionInventario);
+        GestionClientes gestionClientes = new GestionClientes(gestionExtintores);
         _gestionDashboard = new GestionDashboard(
             gestionExtintores,
-            new GestionClientes(),
+            gestionClientes,
             gestionInventario
         );
     }

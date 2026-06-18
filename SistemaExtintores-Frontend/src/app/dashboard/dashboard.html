@@ -1,0 +1,36 @@
+@if (usuario) {
+  <div class="container mt-4">
+    <h2>Bienvenido, {{ usuario.nombreCompleto }}</h2>
+    <p class="text-muted">Rol: {{ usuario.rol }}</p>
+    <hr />
+
+    @if (datos) {
+      <div class="row">
+        <div class="col-md-3">
+          <div class="card text-center p-3">
+            <h5>Clientes activos</h5>
+            <h2>{{ datos.clientesActivos }}</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center p-3">
+            <h5>Extintores vigentes</h5>
+            <h2>{{ datos.extintoresVigentes }}</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center p-3">
+            <h5>Próximos a vencer</h5>
+            <h2>{{ datos.extintoresProximosAVencer }}</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center p-3">
+            <h5>Fuera de norma</h5>
+            <h2>{{ datos.extintoresFueraDeNorma }}</h2>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

@@ -11,13 +11,7 @@ public class DashboardController : ControllerBase
 
     public DashboardController()
     {
-        var gestionInventario = new GestionInventario();
-        var gestionExtintores = new GestionExtintores(gestionInventario);
-        _gestionDashboard = new GestionDashboard(
-            gestionExtintores,
-            new GestionClientes(),
-            gestionInventario
-        );
+        _gestionDashboard = new GestionDashboard();
     }
 
     [HttpGet("resumen")]

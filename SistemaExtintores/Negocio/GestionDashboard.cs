@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using SistemaExtintores.Modelos;
 
 namespace SistemaExtintores.Negocio
@@ -8,13 +10,11 @@ namespace SistemaExtintores.Negocio
         private GestionClientes _gestionClientes;
         private GestionInventario _gestionInventario;
 
-        public GestionDashboard(GestionExtintores gestionExtintores,
-            GestionClientes gestionClientes,
-            GestionInventario gestionInventario)
+        public GestionDashboard()
         {
-            _gestionExtintores = gestionExtintores;
-            _gestionClientes = gestionClientes;
-            _gestionInventario = gestionInventario;
+            _gestionExtintores = new GestionExtintores();
+            _gestionClientes = new GestionClientes();
+            _gestionInventario = new GestionInventario();
         }
 
         public object ObtenerResumen()

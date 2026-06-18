@@ -15,8 +15,6 @@ public class InventarioController : ControllerBase
         _gestionInventario = new GestionInventario();
     }
 
-    // ── Cilindros ──
-
     [HttpGet("lista-cilindros")]
     public IEnumerable<CilindroInventario> ListaCilindros()
     {
@@ -47,16 +45,10 @@ public class InventarioController : ControllerBase
         return _gestionInventario.ObtenerCilindroPorNroSerie(nroSerie);
     }
 
-    [HttpPost("agregar-cilindro")]
-    public CilindroInventario AgregarCilindro([FromBody] CilindroInventario cilindro)
+    [HttpPost("agregar-cilindro/{usuarioId}")]
+    public CilindroInventario AgregarCilindro(int usuarioId, [FromBody] CilindroInventario cilindro)
     {
-        return _gestionInventario.AgregarCilindro(cilindro);
-    }
-
-    [HttpPut("marcar-vendido/{id}")]
-    public CilindroInventario MarcarVendido(int id)
-    {
-        return _gestionInventario.MarcarVendido(id);
+        return _gestionInventario.AgregarCilindro(cilindro, usuarioId);
     }
 
     [HttpDelete("eliminar-cilindro/{id}")]
@@ -64,8 +56,6 @@ public class InventarioController : ControllerBase
     {
         return _gestionInventario.EliminarCilindro(id);
     }
-
-    // ── Insumos ──
 
     [HttpGet("lista-insumos")]
     public IEnumerable<InsumoInventario> ListaInsumos()
@@ -85,10 +75,10 @@ public class InventarioController : ControllerBase
         return _gestionInventario.ObtenerInsumoPorId(id);
     }
 
-    [HttpPost("agregar-insumo")]
-    public InsumoInventario AgregarInsumo([FromBody] InsumoInventario insumo)
+    [HttpPost("agregar-insumo/{usuarioId}")]
+    public InsumoInventario AgregarInsumo(int usuarioId, [FromBody] InsumoInventario insumo)
     {
-        return _gestionInventario.AgregarInsumo(insumo);
+        return _gestionInventario.AgregarInsumo(insumo, usuarioId);
     }
 
     [HttpPut("actualizar-insumo/{id}")]
@@ -97,10 +87,16 @@ public class InventarioController : ControllerBase
         return _gestionInventario.ActualizarInsumo(id, insumo);
     }
 
-    [HttpPut("actualizar-stock-insumo/{id}")]
-    public InsumoInventario ActualizarStockInsumo(int id, [FromBody] double cantidad)
+    [HttpPut("ingreso-insumo/{id}/{usuarioId}")]
+    public bool RegistrarIngresoInsumo(int id, int usuarioId, [FromBody] double cantidad)
     {
-        return _gestionInventario.ActualizarStockInsumo(id, cantidad);
+        return _gestionInventario.RegistrarIngresoInsumo(id, cantidad, usuarioId);
+    }
+
+    [HttpPut("ajuste-insumo/{id}/{usuarioId}")]
+    public bool RegistrarAjusteInsumo(int id, int usuarioId, [FromBody] AjusteInsumoRequest request)
+    {
+        return _gestionInventario.RegistrarAjusteInsumo(id, request.Cantidad, usuarioId, request.Observacion);
     }
 
     [HttpDelete("eliminar-insumo/{id}")]
@@ -108,4 +104,16 @@ public class InventarioController : ControllerBase
     {
         return _gestionInventario.EliminarInsumo(id);
     }
+
+    [HttpGet("movimientos")]
+    public IEnumerable<MovimientoInventario> ListaMovimientos()
+    {
+        return _gestionInventario.ObtenerMovimientos();
+    }
+}
+
+public class AjusteInsumoRequest
+{
+    public double Cantidad { get; set; }
+    public string Observacion { get; set; }
 }

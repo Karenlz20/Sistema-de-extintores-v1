@@ -12,8 +12,7 @@ public class ExtintoresController : ControllerBase
 
     public ExtintoresController()
     {
-        var gestionInventario = new GestionInventario();
-        _gestionExtintores = new GestionExtintores(gestionInventario);
+        _gestionExtintores = new GestionExtintores();
     }
 
     [HttpGet("lista-extintores")]
@@ -26,6 +25,12 @@ public class ExtintoresController : ControllerBase
     public Extintor ObtenerPorId(int id)
     {
         return _gestionExtintores.ObtenerPorId(id);
+    }
+
+    [HttpGet("buscar-extintor/{nroSerie}")]
+    public Extintor BuscarPorNroSerie(string nroSerie)
+    {
+        return _gestionExtintores.ObtenerPorNroSerie(nroSerie);
     }
 
     [HttpGet("por-cliente/{clienteId}")]
@@ -52,10 +57,10 @@ public class ExtintoresController : ControllerBase
         return _gestionExtintores.Actualizar(id, extintor);
     }
 
-    [HttpPost("agregar-recarga/{extintorId}")]
-    public Extintor AgregarRecarga(int extintorId, [FromBody] Recarga recarga)
+    [HttpPost("agregar-recarga/{extintorId}/{usuarioId}")]
+    public Extintor AgregarRecarga(int extintorId, int usuarioId, [FromBody] Recarga recarga)
     {
-        return _gestionExtintores.AgregarRecarga(extintorId, recarga);
+        return _gestionExtintores.AgregarRecarga(extintorId, recarga, usuarioId);
     }
 
     [HttpDelete("eliminar-extintor/{id}")]

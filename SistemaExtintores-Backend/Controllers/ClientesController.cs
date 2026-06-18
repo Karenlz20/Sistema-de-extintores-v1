@@ -42,15 +42,22 @@ public class ClientesController : ControllerBase
     }
 
     [HttpPut("actualizar-cliente/{id}")]
-    public Cliente Actualizar(int id, [FromBody] Cliente cliente)
+    public object Actualizar(int id, [FromBody] ActualizarClienteDto datos)
     {
-        return _gestionClientes.Actualizar(id, cliente);
+        Cliente existente = _gestionClientes.ObtenerPorId(id);
+        if (existente == null) return BadRequest("Cliente no encontrado.");
+        existente.Telefono = datos.Telefono;
+        existente.Correo = datos.Correo;
+        existente.Direccion = datos.Direccion;
+        return Ok(existente);
     }
 
     [HttpDelete("eliminar-cliente/{id}")]
-    public bool Eliminar(int id)
+    public object Eliminar(int id)
     {
-        return _gestionClientes.Eliminar(id);
+        bool ok = _gestionClientes.Eliminar(id);
+        if (!ok) return BadRequest("No se puede dar de baja. El cliente tiene extintores activos.");
+        return Ok(new { Mensaje = "Cliente dado de baja correctamente." });
     }
 
     // ── Sucursales (HU-06) ──
@@ -92,4 +99,11 @@ public class ClientesController : ControllerBase
 
         return Ok(new { Mensaje = "Sucursal dada de baja correctamente." });
     }
+}
+
+public class ActualizarClienteDto
+{
+    public string Telefono { get; set; }
+    public string Correo { get; set; }
+    public string Direccion { get; set; }
 }

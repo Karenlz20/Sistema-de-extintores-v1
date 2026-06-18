@@ -3,7 +3,7 @@ namespace SistemaExtintores.Modelos
     public class ClientePersona : Cliente
     {
         public string NombreCompleto { get; set; }
-        public string CI { get; set; }
+        public string Ci { get; set; }
 
         public ClientePersona() { }
 
@@ -11,13 +11,13 @@ namespace SistemaExtintores.Modelos
         {
             Id = id;
             NombreCompleto = nombreCompleto;
-            CI = ci;
+            Ci = ci;
             Telefono = telefono;
             Correo = correo;
             Direccion = direccion;
         }
 
         public override string ObtenerNombreCompleto() { return NombreCompleto; }
-        public override string ObtenerDocumento() { return "CI: " + CI; }
+        public override string ObtenerDocumento() { return "Ci: " + Ci; }
     }
 }

@@ -1,0 +1,82 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Gestión de Usuarios</h3>
+    <button class="btn btn-primary" (click)="abrirNuevo()">+ Nuevo usuario</button>
+  </div>
+
+  @if (exito) {
+    <div class="alert alert-success">{{ exito }}</div>
+  }
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  @if (mostrarFormulario) {
+    <div class="card mb-4 p-3">
+      <h5>{{ modoEdicion ? 'Editar usuario' : 'Nuevo usuario' }}</h5>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nombre de usuario</label>
+          <input type="text" class="form-control" [(ngModel)]="form.nombreUsuario" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Nombre completo</label>
+          <input type="text" class="form-control" [(ngModel)]="form.nombreCompleto" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Contraseña</label>
+          <input type="password" class="form-control" [(ngModel)]="form.password" placeholder="{{ modoEdicion ? 'Dejar vacío para no cambiar' : '' }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Rol</label>
+          <select class="form-select" [(ngModel)]="form.rol">
+            <option value="Administrador">Administrador</option>
+            <option value="Cajera">Cajera</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-success" (click)="guardar()">Guardar</button>
+        <button class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+      </div>
+    </div>
+  }
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Usuario</th>
+        <th>Nombre completo</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (u of lista; track u.id) {
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.nombreUsuario }}</td>
+          <td>{{ u.nombreCompleto }}</td>
+          <td>{{ u.rol }}</td>
+          <td>
+            @if (u.activo) {
+              <span class="badge bg-success">Activo</span>
+            } @else {
+              <span class="badge bg-secondary">Inactivo</span>
+            }
+          </td>
+          <td class="d-flex gap-2">
+            <button class="btn btn-sm btn-warning" (click)="abrirEdicion(u)">Editar</button>
+            @if (u.activo && u.id !== usuarioActual.id) {
+              <button class="btn btn-sm btn-danger" (click)="darDeBaja(u.id)">Dar de baja</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,23 @@
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow" style="width: 360px;">
+    <div class="card-body p-4">
+      <h4 class="card-title text-center mb-4">Sistema Extintores</h4>
+
+      <div class="mb-3">
+        <label class="form-label">Usuario</label>
+        <input type="text" class="form-control" [(ngModel)]="nombreUsuario" placeholder="Nombre de usuario" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-control" [(ngModel)]="password" placeholder="Contraseña" />
+      </div>
+
+      @if (error) {
+        <div class="alert alert-danger py-2">{{ error }}</div>
+      }
+
+      <button class="btn btn-primary w-100" (click)="iniciarSesion()">Ingresar</button>
+    </div>
+  </div>
+</div>

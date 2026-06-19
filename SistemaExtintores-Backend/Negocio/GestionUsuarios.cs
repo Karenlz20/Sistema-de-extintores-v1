@@ -14,9 +14,9 @@ public class GestionUsuarios
 
     private GestionClientes _gestionClientes;
 
-    public GestionUsuarios(GestionClientes gestionClientes)
+    public GestionUsuarios()
     {
-        _gestionClientes = gestionClientes;
+        _gestionClientes = new GestionClientes();
     }
 
     public List<Usuario> ObtenerTodos()

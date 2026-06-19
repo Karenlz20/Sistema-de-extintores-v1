@@ -14,9 +14,9 @@ namespace SistemaExtintores.Negocio
         private static int _contadorSucursalId = 1;
         private GestionExtintores _gestionExtintores;
 
-        public GestionClientes(GestionExtintores gestionExtintores)
+        public GestionClientes()
         {
-            _gestionExtintores = gestionExtintores;
+            _gestionExtintores = new GestionExtintores();
         }
         public List<Cliente> ObtenerTodos() { return _clientes; }
 

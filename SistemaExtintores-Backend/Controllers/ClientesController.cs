@@ -12,9 +12,7 @@ public class ClientesController : ControllerBase
 
     public ClientesController()
     {
-        GestionInventario gestionInventario = new GestionInventario();
-        GestionExtintores gestionExtintores = new GestionExtintores(gestionInventario);
-        _gestionClientes = new GestionClientes(gestionExtintores);
+        _gestionClientes = new GestionClientes();
     }
 
     [HttpGet("lista-clientes")]

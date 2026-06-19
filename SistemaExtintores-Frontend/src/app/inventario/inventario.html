@@ -1,0 +1,193 @@
+<div class="container mt-4">
+  <h2>Inventario</h2>
+
+  <div *ngIf="mensaje" class="alert alert-info alert-dismissible">
+    {{ mensaje }}
+    <button type="button" class="btn-close" (click)="mensaje = ''"></button>
+  </div>
+
+  <!-- CILINDROS -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Cilindros</h5>
+      <button *ngIf="esAdmin" class="btn btn-primary btn-sm" (click)="mostrarFormCilindro = !mostrarFormCilindro">
+        + Agregar cilindro
+      </button>
+    </div>
+    <div class="card-body">
+
+      <div *ngIf="mostrarFormCilindro && esAdmin" class="border rounded p-3 mb-3 bg-light">
+        <h6>Nuevo cilindro</h6>
+        <div class="row g-2">
+          <div class="col-md-3">
+            <input class="form-control" placeholder="N° de serie" [(ngModel)]="nuevoCilindro.nroSerie" />
+          </div>
+          <div class="col-md-3">
+            <input class="form-control" placeholder="Tipo de agente" [(ngModel)]="nuevoCilindro.tipoAgente" />
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" type="number" placeholder="Capacidad (kg)" [(ngModel)]="nuevoCilindro.capacidad" />
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" type="number" placeholder="Precio unitario" [(ngModel)]="nuevoCilindro.precioUnitario" />
+          </div>
+          <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-success btn-sm" (click)="guardarCilindro()">Guardar</button>
+            <button class="btn btn-secondary btn-sm" (click)="mostrarFormCilindro = false; nuevoCilindro = {}">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <input class="form-control mb-3" placeholder="Buscar por N° de serie o tipo..." [(ngModel)]="filtroCilindro" />
+
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>N° de serie</th>
+            <th>Tipo de agente</th>
+            <th>Capacidad (kg)</th>
+            <th>Precio unitario</th>
+            <th>Disponible</th>
+            <th *ngIf="esAdmin">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of cilindrosFiltrados">
+            <td>{{ c.nroSerie }}</td>
+            <td>{{ c.tipoAgente }}</td>
+            <td>{{ c.capacidad }}</td>
+            <td>{{ c.precioUnitario }}</td>
+            <td>
+              <span class="badge" [class.bg-success]="c.disponible" [class.bg-secondary]="!c.disponible">
+                {{ c.disponible ? 'Disponible' : 'Vendido' }}
+              </span>
+            </td>
+            <td *ngIf="esAdmin">
+              <button class="btn btn-danger btn-sm" (click)="eliminarCilindro(c.id)">Eliminar</button>
+            </td>
+          </tr>
+          <tr *ngIf="cilindrosFiltrados.length === 0">
+            <td colspan="6" class="text-center text-muted">No hay cilindros registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INSUMOS -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Insumos</h5>
+      <div class="d-flex gap-2">
+        <button *ngIf="esAdmin" class="btn btn-warning btn-sm" (click)="mostrarFormIngreso = !mostrarFormIngreso">
+          + Ingreso de stock
+        </button>
+        <button *ngIf="esAdmin" class="btn btn-secondary btn-sm" (click)="mostrarFormAjuste = !mostrarFormAjuste">
+          Ajuste manual
+        </button>
+        <button *ngIf="esAdmin" class="btn btn-primary btn-sm" (click)="mostrarFormInsumo = !mostrarFormInsumo">
+          + Agregar insumo
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div *ngIf="mostrarFormInsumo && esAdmin" class="border rounded p-3 mb-3 bg-light">
+        <h6>Nuevo insumo</h6>
+        <div class="row g-2">
+          <div class="col-md-3">
+            <input class="form-control" placeholder="Nombre" [(ngModel)]="nuevoInsumo.nombre" />
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" placeholder="Unidad (kg, unid...)" [(ngModel)]="nuevoInsumo.unidad" />
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" type="number" placeholder="Stock inicial" [(ngModel)]="nuevoInsumo.stock" />
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" type="number" placeholder="Punto de reorden" [(ngModel)]="nuevoInsumo.puntoReorden" />
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button class="btn btn-success btn-sm" (click)="guardarInsumo()">Guardar</button>
+            <button class="btn btn-secondary btn-sm" (click)="mostrarFormInsumo = false; nuevoInsumo = {}">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="mostrarFormIngreso && esAdmin" class="border rounded p-3 mb-3 bg-light">
+        <h6>Registrar ingreso de stock</h6>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <select class="form-select" [(ngModel)]="insumoSeleccionadoId">
+              <option value="0">Seleccionar insumo...</option>
+              <option *ngFor="let i of insumos" [value]="i.id">{{ i.nombre }} ({{ i.unidad }})</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input class="form-control" type="number" placeholder="Cantidad recibida" [(ngModel)]="cantidadIngreso" />
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button class="btn btn-success btn-sm" (click)="guardarIngreso()">Registrar</button>
+            <button class="btn btn-secondary btn-sm" (click)="mostrarFormIngreso = false">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="mostrarFormAjuste && esAdmin" class="border rounded p-3 mb-3 bg-light">
+        <h6>Ajuste manual de inventario</h6>
+        <div class="row g-2">
+          <div class="col-md-3">
+            <select class="form-select" [(ngModel)]="insumoAjusteId">
+              <option value="0">Seleccionar insumo...</option>
+              <option *ngFor="let i of insumos" [value]="i.id">{{ i.nombre }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" type="number" placeholder="Cantidad (+/-)" [(ngModel)]="cantidadAjuste" />
+          </div>
+          <div class="col-md-4">
+            <input class="form-control" placeholder="Razón del ajuste" [(ngModel)]="observacionAjuste" />
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button class="btn btn-success btn-sm" (click)="guardarAjuste()">Registrar</button>
+            <button class="btn btn-secondary btn-sm" (click)="mostrarFormAjuste = false">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <input class="form-control mb-3" placeholder="Buscar insumo..." [(ngModel)]="filtroInsumo" />
+
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th>
+            <th>Unidad</th>
+            <th>Stock actual</th>
+            <th>Punto de reorden</th>
+            <th>Estado</th>
+            <th *ngIf="esAdmin">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let i of insumosFiltrados" [class.table-danger]="requiereReorden(i)">
+            <td>{{ i.nombre }}</td>
+            <td>{{ i.unidad }}</td>
+            <td>{{ i.stock }}</td>
+            <td>{{ i.puntoReorden }}</td>
+            <td>
+              <span class="badge" [class.bg-danger]="requiereReorden(i)" [class.bg-success]="!requiereReorden(i)">
+                {{ requiereReorden(i) ? 'Reorden requerido' : 'OK' }}
+              </span>
+            </td>
+            <td *ngIf="esAdmin">
+              <button class="btn btn-danger btn-sm" (click)="eliminarInsumo(i.id)">Eliminar</button>
+            </td>
+          </tr>
+          <tr *ngIf="insumosFiltrados.length === 0">
+            <td colspan="6" class="text-center text-muted">No hay insumos registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

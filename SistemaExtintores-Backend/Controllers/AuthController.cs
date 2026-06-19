@@ -12,10 +12,7 @@ public class AuthController : ControllerBase
 
     public AuthController()
     {
-        GestionInventario gestionInventario = new GestionInventario();
-        GestionExtintores gestionExtintores = new GestionExtintores(gestionInventario);
-        GestionClientes gestionClientes = new GestionClientes(gestionExtintores);
-        _gestionUsuarios = new GestionUsuarios(gestionClientes);
+        _gestionUsuarios = new GestionUsuarios();
     }
 
     [HttpPost("login")]

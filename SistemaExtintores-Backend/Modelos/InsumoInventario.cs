@@ -19,8 +19,21 @@ namespace SistemaExtintores.Modelos
             PuntoReorden = puntoReorden;
         }
 
-        public void ActualizarStock(double cantidad) { Stock += cantidad; }
-
         public bool RequiereReorden() { return Stock <= PuntoReorden; }
+
+        public bool IncrementarStock(double cantidad)
+        {
+            if (cantidad <= 0) return false;
+            Stock += cantidad;
+            return true;
+        }
+
+        public bool DisminuirStock(double cantidad)
+        {
+            if (cantidad <= 0) return false;
+            if (cantidad > Stock) return false;
+            Stock -= cantidad;
+            return true;
+        }
     }
 }

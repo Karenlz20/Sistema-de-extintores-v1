@@ -21,7 +21,7 @@ export class Dashboard implements OnInit {
     }
     this.usuario = JSON.parse(guardado);
 
-    this.api.get<any>('http://localhost:5057/Dashboard').subscribe({
+    this.api.get<any>('http://localhost:5057/dashboard/resumen').subscribe({
       next: (res) => this.datos = res,
       error: () => {}
     });

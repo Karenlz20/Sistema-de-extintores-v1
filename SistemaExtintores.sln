@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaExtintores", "SistemaExtintores\SistemaExtintores.csproj", "{A5BFA91D-09FF-459A-A721-1B6D55D5D1AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaExtintores", "SistemaExtintores-Backend\SistemaExtintores.csproj", "{A5BFA91D-09FF-459A-A721-1B6D55D5D1AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -9,13 +9,10 @@ namespace SistemaExtintores.Controllers;
 public class UsuariosController : ControllerBase
 {
     private GestionUsuarios _gestionUsuarios;
-    
+
     public UsuariosController()
     {
-        GestionInventario gestionInventario = new GestionInventario();
-        GestionExtintores gestionExtintores = new GestionExtintores(gestionInventario);
-        GestionClientes gestionClientes = new GestionClientes(gestionExtintores);
-        _gestionUsuarios = new GestionUsuarios(gestionClientes);
+        _gestionUsuarios = new GestionUsuarios();
     }
 
     [HttpGet("lista-usuarios")]
@@ -29,13 +26,13 @@ public class UsuariosController : ControllerBase
     {
         return _gestionUsuarios.ObtenerPorId(id);
     }
-    
+
     [HttpPost("agregar-usuario")]
     public Usuario AgregarUsuario([FromBody] Usuario usuario)
     {
         return _gestionUsuarios.Agregar(usuario);
     }
-    
+
     [HttpPut("actualizar-usuario/{id}")]
     public Usuario Actualizar(int id, [FromBody] Usuario usuario)
     {

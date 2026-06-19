@@ -1,51 +1,71 @@
+using System;
+using System.Collections.Generic;
+
 namespace SistemaExtintores.Modelos
 {
     public class Venta
     {
+        private const double IVA = 0.13;
+
         public int Id { get; set; }
         public DateTime Fecha { get; set; }
         public int ClienteId { get; set; }
         public int? SucursalId { get; set; }
-        public string Cajera { get; set; }
-        public double Descuento { get; set; } = 0;
-        public bool Confirmada { get; set; } = false;
-        public List<ItemVenta> Items { get; set; } = new List<ItemVenta>();
+        public int UsuarioId { get; set; }
+        public double Descuento { get; set; }
+        public EstadoVenta Estado { get; set; }
+        public string NumeroComprobante { get; set; }
+        public List<ItemVenta> Items { get; set; }
 
-        public Venta() { }
+        public Venta()
+        {
+            Fecha = DateTime.Now;
+            Estado = EstadoVenta.Pendiente;
+            NumeroComprobante = "";
+            Items = new List<ItemVenta>();
+        }
 
-        public Venta(int id, int clienteId, string cajera, double descuento, DateTime fecha)
+        public Venta(int id, int clienteId, int usuarioId)
         {
             Id = id;
             ClienteId = clienteId;
-            Cajera = cajera;
-            Descuento = descuento;
-            Fecha = fecha;
+            UsuarioId = usuarioId;
+            Fecha = DateTime.Now;
+            Estado = EstadoVenta.Pendiente;
+            NumeroComprobante = "";
+            Descuento = 0;
+            Items = new List<ItemVenta>();
         }
 
-        public void Confirmar() { Confirmada = true; }
-        public void AgregarItem(ItemVenta item) { Items.Add(item); }
+        public void AgregarItem(ItemVenta item) { if (item != null) Items.Add(item); }
+
+        public double ObtenerSubtotal()
+        {
+            double subtotal = 0;
+            foreach (ItemVenta item in Items) subtotal += item.ObtenerSubtotal();
+            return subtotal;
+        }
+
+        public double ObtenerMontoDescuento() { return ObtenerSubtotal() * (Descuento / 100); }
+
+        public double ObtenerMontoIVA()
+        {
+            double subtotal = ObtenerSubtotal();
+            double descuento = ObtenerMontoDescuento();
+            return (subtotal - descuento) * IVA;
+        }
 
         public double ObtenerTotal()
         {
-            double subtotal = 0;
-            foreach (ItemVenta item in Items)
-            {
-                subtotal += item.ObtenerSubtotal();
-            }
-            return subtotal - (subtotal * Descuento / 100);
+            return ObtenerSubtotal() - ObtenerMontoDescuento() + ObtenerMontoIVA();
         }
 
-        public object ObtenerResumen()
+        public string GenerarComprobante()
         {
-            return new
-            {
-                VentaId = Id,
-                Fecha = Fecha,
-                ClienteId = ClienteId,
-                Cajera = Cajera,
-                Confirmada = Confirmada,
-                Total = ObtenerTotal()
-            };
+            string correlativo = Id.ToString();
+            while (correlativo.Length < 6) correlativo = "0" + correlativo;
+            NumeroComprobante = "V-" + Fecha.Year + "-" + correlativo;
+            return NumeroComprobante;
         }
     }
 }

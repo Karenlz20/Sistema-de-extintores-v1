@@ -127,6 +127,7 @@
               }
             </td>
             <td class="d-flex gap-1 flex-wrap">
+              <button class="btn btn-sm btn-primary" (click)="verPerfil(c.id)">Ver perfil</button>
               @if (c.activo) {
                 <button class="btn btn-sm btn-warning" (click)="abrirEdicion(c)">Editar</button>
               }

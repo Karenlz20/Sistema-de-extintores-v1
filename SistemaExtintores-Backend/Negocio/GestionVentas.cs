@@ -97,6 +97,7 @@ namespace SistemaExtintores.Negocio
             Venta venta = ObtenerPorId(ventaId);
             if (venta == null) return null;
             if (venta.Estado != EstadoVenta.Pendiente) return null;
+            if (venta.Items.Count == 0) return null;
 
             foreach (ItemVenta item in venta.Items)
             {
@@ -104,26 +105,23 @@ namespace SistemaExtintores.Negocio
                 {
                     ExtintorItem extItem = (ExtintorItem)item;
 
-                    CilindroInventario cilindro = _gestionInventario.ObtenerCilindroPorNroSerie(extItem.NroSerie);
-                    if (cilindro == null) return null;
-                    if (!cilindro.Disponible) return null;
-
-                    Extintor extintorExistente = _gestionExtintores.ObtenerPorNroSerie(cilindro.NroSerie);
+                    Extintor extintorExistente = _gestionExtintores.ObtenerPorNroSerie(extItem.NroSerie);
                     if (extintorExistente != null) return null;
 
-                    bool marcado = _gestionInventario.MarcarVendido(cilindro.Id, usuarioId);
-                    if (!marcado) return null;
+                    CilindroInventario cilindro = _gestionInventario.ObtenerCilindroPorNroSerie(extItem.NroSerie);
+                    if (cilindro != null && cilindro.Disponible)
+                        _gestionInventario.MarcarVendido(cilindro.Id, usuarioId);
 
                     Extintor nuevoExtintor = new Extintor();
-                    nuevoExtintor.NroSerie = cilindro.NroSerie;
-                    nuevoExtintor.TipoAgente = cilindro.TipoAgente;
-                    nuevoExtintor.Capacidad = cilindro.Capacidad;
+                    nuevoExtintor.NroSerie = extItem.NroSerie;
+                    nuevoExtintor.TipoAgente = extItem.TipoAgente;
+                    nuevoExtintor.Capacidad = extItem.Capacidad;
                     nuevoExtintor.FechaFabricacion = DateTime.Now;
                     nuevoExtintor.FechaUltimaCarga = DateTime.Now;
                     nuevoExtintor.FechaVencimiento = DateTime.Now.AddYears(1);
                     nuevoExtintor.ClienteId = venta.ClienteId;
                     nuevoExtintor.SucursalId = venta.SucursalId;
-                    nuevoExtintor.CilindroInventarioId = cilindro.Id;
+                    nuevoExtintor.CilindroInventarioId = cilindro != null ? cilindro.Id : (int?)null;
 
                     Extintor agregado = _gestionExtintores.Agregar(nuevoExtintor);
                     if (agregado == null) return null;

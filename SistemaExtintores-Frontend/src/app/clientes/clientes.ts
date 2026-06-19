@@ -30,6 +30,8 @@ export class Clientes implements OnInit {
 
   constructor(private api: ApiClient, private router: Router) {}
 
+  verPerfil(id: number) { this.router.navigate(['/clientes', id]); }
+
   ngOnInit() {
     const guardado = localStorage.getItem('usuario');
     if (!guardado) { this.router.navigate(['/login']); return; }

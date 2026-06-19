@@ -32,15 +32,17 @@ namespace SistemaExtintores.Modelos
             CilindroInventarioId = cilindroInventarioId;
         }
 
-        public EstadoVigencia ObtenerEstado()
+        public EstadoVigencia Estado
         {
-            int diasRestantes = (FechaVencimiento - DateTime.Now).Days;
-            if (diasRestantes < 0)
-                return EstadoVigencia.FueraDeNorma;
-            else if (diasRestantes <= 30)
-                return EstadoVigencia.ProximoAVencer;
-            else
+            get
+            {
+                int diasRestantes = (FechaVencimiento - DateTime.Now).Days;
+                if (diasRestantes < 0) return EstadoVigencia.FueraDeNorma;
+                if (diasRestantes <= 30) return EstadoVigencia.ProximoAVencer;
                 return EstadoVigencia.Vigente;
+            }
         }
+
+        public EstadoVigencia ObtenerEstado() { return Estado; }
     }
 }

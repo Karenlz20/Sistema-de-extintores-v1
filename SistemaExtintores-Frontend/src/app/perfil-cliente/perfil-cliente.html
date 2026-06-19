@@ -1,0 +1,53 @@
+<div class="container mt-4">
+  <button class="btn btn-secondary mb-3" (click)="volver()">← Volver a clientes</button>
+
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  @if (cliente) {
+    <div class="card mb-4 p-3">
+      <h4>{{ esEmpresa() ? cliente.razonSocial : cliente.nombreCompleto }}</h4>
+      <p class="text-muted mb-1">{{ esEmpresa() ? 'NIT: ' + cliente.nit : 'CI: ' + cliente.ci }}</p>
+      <p class="mb-1"><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+      <p class="mb-1"><strong>Correo:</strong> {{ cliente.correo }}</p>
+      <p class="mb-1"><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+      @if (esEmpresa()) {
+        <p class="mb-1"><strong>Contacto:</strong> {{ cliente.nombreContacto }}</p>
+      }
+    </div>
+
+    <h5>Extintores ({{ extintores.length }})</h5>
+
+    @if (extintores.length === 0) {
+      <p class="text-muted">Este cliente no tiene extintores registrados.</p>
+    } @else {
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>N° Serie</th>
+            <th>Tipo</th>
+            <th>Capacidad</th>
+            <th>Vencimiento</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of extintores; track e.id) {
+            <tr>
+              <td>{{ e.nroSerie }}</td>
+              <td>{{ e.tipoAgente }}</td>
+              <td>{{ e.capacidad }} kg</td>
+              <td>{{ e.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="badge {{ obtenerEstadoBadge(e.estadoVigencia ?? e.estado) }}">
+                  {{ e.estadoVigencia ?? e.estado }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</div>

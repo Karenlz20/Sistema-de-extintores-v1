@@ -84,6 +84,7 @@ export interface Extintor {
   fechaFabricacion: string;
   fechaUltimaCarga: string;
   fechaVencimiento: string;
+  estado: EstadoVigencia;
   clienteId: number;
   sucursalId?: number;
   cilindroInventarioId?: number;
@@ -94,6 +95,12 @@ export interface ItemVenta {
   id: number;
   cantidad: number;
   precioUnitario: number;
+  descripcion?: string;
+  nroSerie?: string;
+  tipoAgente?: string;
+  capacidad?: number;
+  nroSerieExtintor?: string;
+  insumoId?: number;
 }
 
 export interface ExtintorItem extends ItemVenta {

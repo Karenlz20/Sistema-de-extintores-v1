@@ -159,8 +159,9 @@
           </thead>
           <tbody>
             <tr *ngFor="let item of ventaActual.items">
+              <td>{{ $any(item).nroSerie || $any(item).nroSerieExtintor || ('Item #' + item.id) }}</td>
               <td>{{ item.cantidad }}</td>
-              <td>{{ item.precioUnitario }}</td>
+              <td>{{ item.precioUnitario | number:'1.2-2' }}</td>
               <td>{{ item.cantidad * item.precioUnitario | number:'1.2-2' }}</td>
             </tr>
             <tr *ngIf="ventaActual.items.length === 0">
@@ -212,18 +213,27 @@
         <button class="btn btn-secondary btn-sm" (click)="volver()">Volver</button>
       </div>
       <div class="card-body">
-        <p><strong>Fecha:</strong> {{ ventaDetalle.fecha | date:'dd/MM/yyyy' }}</p>
-        <p><strong>ID Cliente:</strong> {{ ventaDetalle.clienteId }}</p>
-        <p>
-          <strong>Estado:</strong>
-          <span class="badge ms-1" [ngClass]="obtenerClaseEstado(ventaDetalle.estado)">
-            {{ obtenerTextoEstado(ventaDetalle.estado) }}
-          </span>
-        </p>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <p class="mb-1"><strong>Cliente:</strong> {{ nombreCliente() || ('ID ' + ventaDetalle.clienteId) }}</p>
+            <p class="mb-1"><strong>Identificación:</strong> {{ identificacionCliente() }}</p>
+            <p class="mb-1"><strong>Dirección:</strong> {{ clienteActual?.direccion }}</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <p class="mb-1"><strong>Fecha:</strong> {{ ventaDetalle.fecha | date:'dd/MM/yyyy' }}</p>
+            <p class="mb-1">
+              <strong>Estado:</strong>
+              <span class="badge ms-1" [ngClass]="obtenerClaseEstado(ventaDetalle.estado)">
+                {{ obtenerTextoEstado(ventaDetalle.estado) }}
+              </span>
+            </p>
+          </div>
+        </div>
 
         <table class="table table-bordered">
           <thead class="table-dark">
             <tr>
+              <th>Descripción</th>
               <th>Cantidad</th>
               <th>Precio unitario</th>
               <th>Subtotal</th>
@@ -231,8 +241,9 @@
           </thead>
           <tbody>
             <tr *ngFor="let item of ventaDetalle.items">
+              <td>{{ item.descripcion || item.nroSerie || item.nroSerieExtintor || ('Item #' + item.id) }}</td>
               <td>{{ item.cantidad }}</td>
-              <td>{{ item.precioUnitario }}</td>
+              <td>{{ item.precioUnitario | number:'1.2-2' }}</td>
               <td>{{ item.cantidad * item.precioUnitario | number:'1.2-2' }}</td>
             </tr>
           </tbody>
@@ -278,14 +289,24 @@
         <h4 class="text-center">Sistema Extintores</h4>
         <h5 class="text-center">Comprobante de venta</h5>
         <hr>
-        <p><strong>N° Comprobante:</strong> {{ ventaComprobante.numeroComprobante }}</p>
-        <p><strong>Fecha:</strong> {{ ventaComprobante.fecha | date:'dd/MM/yyyy' }}</p>
-        <p><strong>ID Cliente:</strong> {{ ventaComprobante.clienteId }}</p>
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <p class="mb-1"><strong>N° Comprobante:</strong> {{ ventaComprobante.numeroComprobante }}</p>
+            <p class="mb-1"><strong>Fecha:</strong> {{ ventaComprobante.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="mb-1"><strong>Cliente:</strong> {{ nombreCliente() || ('ID ' + ventaComprobante.clienteId) }}</p>
+            <p class="mb-1"><strong>Identificación:</strong> {{ identificacionCliente() }}</p>
+            <p class="mb-1"><strong>Dirección:</strong> {{ clienteActual?.direccion }}</p>
+            <p class="mb-1"><strong>Teléfono:</strong> {{ clienteActual?.telefono }}</p>
+          </div>
+        </div>
         <hr>
 
         <table class="table table-bordered">
-          <thead>
+          <thead class="table-dark">
             <tr>
+              <th>Descripción</th>
               <th>Cantidad</th>
               <th>Precio unitario</th>
               <th>Subtotal</th>
@@ -293,8 +314,9 @@
           </thead>
           <tbody>
             <tr *ngFor="let item of ventaComprobante.items">
+              <td>{{ item.descripcion || item.nroSerie || item.nroSerieExtintor || ('Item #' + item.id) }}</td>
               <td>{{ item.cantidad }}</td>
-              <td>{{ item.precioUnitario }}</td>
+              <td>{{ item.precioUnitario | number:'1.2-2' }}</td>
               <td>{{ item.cantidad * item.precioUnitario | number:'1.2-2' }}</td>
             </tr>
           </tbody>

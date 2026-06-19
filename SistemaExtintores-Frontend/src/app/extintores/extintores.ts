@@ -57,7 +57,7 @@ export class Extintores implements OnInit {
     const resultado: Extintor[] = [];
     for (const e of this.extintores) {
       const coincideSerie = e.nroSerie.toLowerCase().includes(serie);
-      const coincideEstado = this.filtroEstado === '' || this.obtenerEstado(e) === this.filtroEstado;
+      const coincideEstado = this.filtroEstado === '' || e.estado === this.filtroEstado;
       if (coincideSerie && coincideEstado) {
         resultado.push(e);
       }
@@ -65,27 +65,10 @@ export class Extintores implements OnInit {
     return resultado;
   }
 
-  obtenerEstado(extintor: Extintor) {
-    const hoy = new Date();
-    const vencimiento = new Date(extintor.fechaVencimiento);
-    const diasRestantes = Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
-    if (diasRestantes < 0) return EstadoVigencia.FueraDeNorma;
-    if (diasRestantes <= 30) return EstadoVigencia.ProximoAVencer;
-    return EstadoVigencia.Vigente;
-  }
-
-  obtenerClaseEstado(extintor: Extintor) {
-    const estado = this.obtenerEstado(extintor);
-    if (estado === EstadoVigencia.Vigente) return 'bg-success';
-    if (estado === EstadoVigencia.ProximoAVencer) return 'bg-warning';
+  obtenerClaseEstado(estado: string) {
+    if (estado === 'Vigente') return 'bg-success';
+    if (estado === 'ProximoAVencer') return 'bg-warning text-dark';
     return 'bg-danger';
-  }
-
-  obtenerTextoEstado(extintor: Extintor) {
-    const estado = this.obtenerEstado(extintor);
-    if (estado === EstadoVigencia.Vigente) return 'Vigente';
-    if (estado === EstadoVigencia.ProximoAVencer) return 'Próximo a vencer';
-    return 'Fuera de norma';
   }
 
     guardarExtintor() {

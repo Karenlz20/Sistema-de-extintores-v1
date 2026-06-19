@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { VentasService } from './ventas.service';
 import { Venta, ExtintorItem, RecargaItem, EstadoVenta, Usuario, RolUsuario } from '../modelos/modelos';
 import { Router } from '@angular/router';
+import { ApiClient } from '../core/http/api-client';
 
 @Component({
   selector: 'app-ventas',
@@ -44,9 +45,10 @@ export class Ventas implements OnInit {
   mostrarComprobante = false;
   ventaComprobante: Venta | null = null;
 
+  clienteActual: any = null;
   mensaje = '';
 
-  constructor(private ventasService: VentasService, private router: Router) {}
+  constructor(private ventasService: VentasService, private router: Router, private api: ApiClient) {}
 
   ngOnInit() {
     const raw = localStorage.getItem('usuario');
@@ -144,16 +146,22 @@ export class Ventas implements OnInit {
 
   confirmarVenta() {
     if (!this.ventaActual || !this.usuario) return;
+    if (this.ventaActual.items.length === 0) {
+      this.mensaje = 'Agregue al menos un item antes de confirmar.';
+      return;
+    }
     if (!confirm('¿Confirmar la venta?')) return;
-    this.ventasService.confirmarVenta(this.ventaActual.id, this.usuario.id).subscribe(data => {
-      if (data) {
+    this.ventasService.confirmarVenta(this.ventaActual.id, this.usuario.id).subscribe({
+      next: (data) => {
         this.ventaComprobante = data;
         this.mostrarCarrito = false;
         this.mostrarComprobante = true;
+        this.cargarCliente(data.clienteId);
         this.ventaActual = null;
         this.cargarVentas();
-      } else {
-        this.mensaje = 'Error al confirmar la venta.';
+      },
+      error: () => {
+        this.mensaje = 'Error al confirmar la venta. Verifique que los N° de serie no estén duplicados.';
       }
     });
   }
@@ -165,11 +173,33 @@ export class Ventas implements OnInit {
     });
   }
 
+  cargarCliente(clienteId: number) {
+    this.clienteActual = null;
+    if (!clienteId) return;
+    this.api.get<any>(`http://localhost:5057/Clientes/obtener-cliente/${clienteId}`).subscribe({
+      next: (c) => this.clienteActual = c,
+      error: () => {}
+    });
+  }
+
+  nombreCliente() {
+    if (!this.clienteActual) return '';
+    return this.clienteActual.nombreCompleto || this.clienteActual.razonSocial || '';
+  }
+
+  identificacionCliente() {
+    if (!this.clienteActual) return '';
+    if (this.clienteActual.ci) return 'CI: ' + this.clienteActual.ci;
+    if (this.clienteActual.nit) return 'NIT: ' + this.clienteActual.nit;
+    return '';
+  }
+
   verDetalle(venta: Venta) {
     this.ventaDetalle = venta;
     this.mostrarDetalle = true;
     this.mostrarCarrito = false;
     this.mostrarComprobante = false;
+    this.cargarCliente(venta.clienteId);
   }
 
   verComprobante(venta: Venta) {
@@ -177,6 +207,7 @@ export class Ventas implements OnInit {
     this.mostrarComprobante = true;
     this.mostrarDetalle = false;
     this.mostrarCarrito = false;
+    this.cargarCliente(venta.clienteId);
   }
 
   imprimir() {
@@ -190,6 +221,7 @@ export class Ventas implements OnInit {
     this.ventaActual = null;
     this.ventaDetalle = null;
     this.ventaComprobante = null;
+    this.clienteActual = null;
   }
 
   obtenerSubtotal(venta: Venta) {

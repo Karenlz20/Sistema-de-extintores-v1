@@ -64,9 +64,11 @@ public class VentasController : ControllerBase
     }
 
     [HttpPut("confirmar-venta/{ventaId}/{usuarioId}")]
-    public Venta ConfirmarVenta(int ventaId, int usuarioId)
+    public IActionResult ConfirmarVenta(int ventaId, int usuarioId)
     {
-        return _gestionVentas.ConfirmarVenta(ventaId, usuarioId);
+        Venta venta = _gestionVentas.ConfirmarVenta(ventaId, usuarioId);
+        if (venta == null) return BadRequest("No se pudo confirmar la venta. Verifique que tenga items y que los N° de serie no estén duplicados.");
+        return Ok(venta);
     }
 
     [HttpPut("anular-venta/{ventaId}")]

@@ -1,5 +1,10 @@
+using System.Text.Json.Serialization;
+
 namespace SistemaExtintores.Modelos
 {
+    [JsonPolymorphic]
+    [JsonDerivedType(typeof(ClientePersona))]
+    [JsonDerivedType(typeof(ClienteEmpresa))]
     public abstract class Cliente
     {
         public int Id { get; set; }

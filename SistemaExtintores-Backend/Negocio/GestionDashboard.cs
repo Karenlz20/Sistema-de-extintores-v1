@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using SistemaExtintores.Modelos;
 
 namespace SistemaExtintores.Negocio

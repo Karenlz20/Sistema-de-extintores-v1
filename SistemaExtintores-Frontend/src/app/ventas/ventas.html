@@ -1,0 +1,328 @@
+<div class="container mt-4">
+  <h2>Ventas</h2>
+
+  <div *ngIf="mensaje" class="alert alert-info alert-dismissible">
+    {{ mensaje }}
+    <button type="button" class="btn-close" (click)="mensaje = ''"></button>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div *ngIf="!mostrarCarrito && !mostrarDetalle && !mostrarComprobante">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Historial de ventas</h5>
+        <button class="btn btn-primary btn-sm" (click)="iniciarVenta()">+ Nueva venta</button>
+      </div>
+      <div class="card-body">
+
+        <!-- FILTROS -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-3">
+            <input class="form-control" type="number" placeholder="ID cliente" [(ngModel)]="filtroClienteId" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Desde</label>
+            <input class="form-control" type="date" [(ngModel)]="filtroDesdeFecha" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Hasta</label>
+            <input class="form-control" type="date" [(ngModel)]="filtroHastaFecha" />
+          </div>
+        </div>
+
+        <!-- TABLA -->
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>N° Comprobante</th>
+              <th>Fecha</th>
+              <th>ID Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of ventasFiltradas">
+              <td>{{ v.numeroComprobante || '-' }}</td>
+              <td>{{ v.fecha | date:'dd/MM/yyyy' }}</td>
+              <td>{{ v.clienteId }}</td>
+              <td>{{ obtenerTotal(v) | number:'1.2-2' }}</td>
+              <td>
+                <span class="badge" [ngClass]="obtenerClaseEstado(v.estado)">
+                  {{ obtenerTextoEstado(v.estado) }}
+                </span>
+              </td>
+              <td class="d-flex gap-1">
+                <button class="btn btn-info btn-sm" (click)="verDetalle(v)">Detalle</button>
+                <button *ngIf="v.estado === 'Confirmada'" class="btn btn-secondary btn-sm" (click)="verComprobante(v)">Comprobante</button>
+                <button *ngIf="v.estado === 'Pendiente' && esAdmin" class="btn btn-danger btn-sm" (click)="anularVenta(v.id)">Anular</button>
+              </td>
+            </tr>
+            <tr *ngIf="ventasFiltradas.length === 0">
+              <td colspan="6" class="text-center text-muted">No hay ventas registradas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARRITO -->
+  <div *ngIf="mostrarCarrito && ventaActual">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Nueva venta</h5>
+        <button class="btn btn-secondary btn-sm" (click)="volver()">Cancelar</button>
+      </div>
+      <div class="card-body">
+
+        <!-- CLIENTE -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-3">
+            <input class="form-control" type="number" placeholder="ID cliente" [(ngModel)]="ventaActual.clienteId" />
+          </div>
+          <div class="col-md-3">
+            <input class="form-control" type="number" placeholder="ID sucursal (opcional)" [(ngModel)]="ventaActual.sucursalId" />
+          </div>
+        </div>
+
+        <!-- BOTONES AGREGAR ITEMS -->
+        <div class="d-flex gap-2 mb-3">
+          <button class="btn btn-outline-primary btn-sm" (click)="mostrarFormExtintor = !mostrarFormExtintor; mostrarFormRecarga = false">
+            + Extintor nuevo
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" (click)="mostrarFormRecarga = !mostrarFormRecarga; mostrarFormExtintor = false">
+            + Recarga
+          </button>
+        </div>
+
+        <!-- FORM EXTINTOR -->
+        <div *ngIf="mostrarFormExtintor" class="border rounded p-3 mb-3 bg-light">
+          <h6>Agregar extintor</h6>
+          <div class="row g-2">
+            <div class="col-md-3">
+              <input class="form-control" placeholder="N° de serie del cilindro" [(ngModel)]="nuevoItemExtintor.nroSerie" />
+            </div>
+            <div class="col-md-3">
+              <input class="form-control" placeholder="Tipo de agente" [(ngModel)]="nuevoItemExtintor.tipoAgente" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="Capacidad (kg)" [(ngModel)]="nuevoItemExtintor.capacidad" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="Precio unitario" [(ngModel)]="nuevoItemExtintor.precioUnitario" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="Cantidad" [(ngModel)]="nuevoItemExtintor.cantidad" />
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+              <button class="btn btn-success btn-sm" (click)="agregarExtintor()">Agregar</button>
+              <button class="btn btn-secondary btn-sm" (click)="mostrarFormExtintor = false">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM RECARGA -->
+        <div *ngIf="mostrarFormRecarga" class="border rounded p-3 mb-3 bg-light">
+          <h6>Agregar recarga</h6>
+          <div class="row g-2">
+            <div class="col-md-3">
+              <input class="form-control" placeholder="N° de serie del extintor" [(ngModel)]="nuevoItemRecarga.nroSerieExtintor" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="ID insumo" [(ngModel)]="nuevoItemRecarga.insumoId" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="Cantidad (kg)" [(ngModel)]="nuevoItemRecarga.cantidad" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="Precio unitario" [(ngModel)]="nuevoItemRecarga.precioUnitario" />
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+              <button class="btn btn-success btn-sm" (click)="agregarRecarga()">Agregar</button>
+              <button class="btn btn-secondary btn-sm" (click)="mostrarFormRecarga = false">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ITEMS EN EL CARRITO -->
+        <h6>Items en el carrito</h6>
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>Descripción</th>
+              <th>Cantidad</th>
+              <th>Precio unitario</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of ventaActual.items">
+              <td>{{ item.cantidad }}</td>
+              <td>{{ item.precioUnitario }}</td>
+              <td>{{ item.cantidad * item.precioUnitario | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="ventaActual.items.length === 0">
+              <td colspan="4" class="text-center text-muted">Sin items agregados.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- RESUMEN -->
+        <div class="row justify-content-end">
+          <div class="col-md-4">
+            <table class="table table-bordered">
+              <tr>
+                <td><strong>Subtotal</strong></td>
+                <td>{{ obtenerSubtotal(ventaActual) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>Descuento ({{ ventaActual.descuento }}%)</strong></td>
+                <td>{{ obtenerDescuento(ventaActual) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>IVA (13%)</strong></td>
+                <td>{{ obtenerIVA(ventaActual) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td><strong>{{ obtenerTotal(ventaActual) | number:'1.2-2' }}</strong></td>
+              </tr>
+            </table>
+
+            <!-- DESCUENTO -->
+            <div class="input-group mb-3">
+              <input class="form-control" type="number" placeholder="% descuento" [(ngModel)]="porcentajeDescuento" />
+              <button class="btn btn-outline-secondary" (click)="aplicarDescuento()">Aplicar</button>
+            </div>
+
+            <button class="btn btn-success w-100" (click)="confirmarVenta()">Confirmar venta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETALLE -->
+  <div *ngIf="mostrarDetalle && ventaDetalle">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Detalle de venta — {{ ventaDetalle.numeroComprobante || 'Pendiente' }}</h5>
+        <button class="btn btn-secondary btn-sm" (click)="volver()">Volver</button>
+      </div>
+      <div class="card-body">
+        <p><strong>Fecha:</strong> {{ ventaDetalle.fecha | date:'dd/MM/yyyy' }}</p>
+        <p><strong>ID Cliente:</strong> {{ ventaDetalle.clienteId }}</p>
+        <p>
+          <strong>Estado:</strong>
+          <span class="badge ms-1" [ngClass]="obtenerClaseEstado(ventaDetalle.estado)">
+            {{ obtenerTextoEstado(ventaDetalle.estado) }}
+          </span>
+        </p>
+
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>Cantidad</th>
+              <th>Precio unitario</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of ventaDetalle.items">
+              <td>{{ item.cantidad }}</td>
+              <td>{{ item.precioUnitario }}</td>
+              <td>{{ item.cantidad * item.precioUnitario | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="row justify-content-end">
+          <div class="col-md-4">
+            <table class="table table-bordered">
+              <tr>
+                <td><strong>Subtotal</strong></td>
+                <td>{{ obtenerSubtotal(ventaDetalle) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>Descuento ({{ ventaDetalle.descuento }}%)</strong></td>
+                <td>{{ obtenerDescuento(ventaDetalle) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>IVA (13%)</strong></td>
+                <td>{{ obtenerIVA(ventaDetalle) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td><strong>{{ obtenerTotal(ventaDetalle) | number:'1.2-2' }}</strong></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPROBANTE -->
+  <div *ngIf="mostrarComprobante && ventaComprobante">
+    <div class="card mb-4" id="comprobante">
+      <div class="card-header d-flex justify-content-between align-items-center no-print">
+        <h5 class="mb-0">Comprobante</h5>
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary btn-sm" (click)="imprimir()">Imprimir / PDF</button>
+          <button class="btn btn-secondary btn-sm" (click)="volver()">Volver</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <h4 class="text-center">Sistema Extintores</h4>
+        <h5 class="text-center">Comprobante de venta</h5>
+        <hr>
+        <p><strong>N° Comprobante:</strong> {{ ventaComprobante.numeroComprobante }}</p>
+        <p><strong>Fecha:</strong> {{ ventaComprobante.fecha | date:'dd/MM/yyyy' }}</p>
+        <p><strong>ID Cliente:</strong> {{ ventaComprobante.clienteId }}</p>
+        <hr>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Cantidad</th>
+              <th>Precio unitario</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of ventaComprobante.items">
+              <td>{{ item.cantidad }}</td>
+              <td>{{ item.precioUnitario }}</td>
+              <td>{{ item.cantidad * item.precioUnitario | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="row justify-content-end">
+          <div class="col-md-4">
+            <table class="table table-bordered">
+              <tr>
+                <td><strong>Subtotal</strong></td>
+                <td>{{ obtenerSubtotal(ventaComprobante) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>Descuento ({{ ventaComprobante.descuento }}%)</strong></td>
+                <td>{{ obtenerDescuento(ventaComprobante) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>IVA (13%)</strong></td>
+                <td>{{ obtenerIVA(ventaComprobante) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td><strong>{{ obtenerTotal(ventaComprobante) | number:'1.2-2' }}</strong></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

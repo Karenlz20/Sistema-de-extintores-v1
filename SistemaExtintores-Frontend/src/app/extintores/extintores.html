@@ -1,0 +1,199 @@
+<div class="container mt-4">
+  <h2>Extintores</h2>
+
+  <div *ngIf="mensaje" class="alert alert-info alert-dismissible">
+    {{ mensaje }}
+    <button type="button" class="btn-close" (click)="mensaje = ''"></button>
+  </div>
+
+  <!-- LISTA DE EXTINTORES -->
+  <div *ngIf="!mostrarHojaDeVida">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Lista de extintores</h5>
+        <button *ngIf="esAdmin" class="btn btn-primary btn-sm" (click)="mostrarFormExtintor = !mostrarFormExtintor">
+          + Registrar extintor
+        </button>
+      </div>
+      <div class="card-body">
+
+        <!-- FORMULARIO NUEVO EXTINTOR -->
+        <div *ngIf="mostrarFormExtintor && esAdmin" class="border rounded p-3 mb-3 bg-light">
+          <h6>Nuevo extintor</h6>
+          <div class="row g-2">
+            <div class="col-md-3">
+              <input class="form-control" placeholder="N° de serie" [(ngModel)]="nuevoExtintor.nroSerie" />
+            </div>
+            <div class="col-md-3">
+              <input class="form-control" placeholder="Tipo de agente" [(ngModel)]="nuevoExtintor.tipoAgente" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="Capacidad (kg)" [(ngModel)]="nuevoExtintor.capacidad" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="ID cliente" [(ngModel)]="nuevoExtintor.clienteId" />
+            </div>
+            <div class="col-md-2">
+              <input class="form-control" type="number" placeholder="ID sucursal (opcional)" [(ngModel)]="nuevoExtintor.sucursalId" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Fecha de fabricación</label>
+              <input class="form-control" type="date" [(ngModel)]="nuevoExtintor.fechaFabricacion" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Fecha última carga</label>
+              <input class="form-control" type="date" [(ngModel)]="nuevoExtintor.fechaUltimaCarga" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Fecha vencimiento</label>
+              <input class="form-control" type="date" [(ngModel)]="nuevoExtintor.fechaVencimiento" />
+            </div>
+            <div class="col-md-3 d-flex gap-2 align-items-end">
+              <button class="btn btn-success btn-sm" (click)="guardarExtintor()">Guardar</button>
+              <button class="btn btn-secondary btn-sm" (click)="mostrarFormExtintor = false; nuevoExtintor = {}">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <input class="form-control" placeholder="Buscar por N° de serie..." [(ngModel)]="filtroSerie" />
+          </div>
+          <div class="col-md-4">
+            <select class="form-select" [(ngModel)]="filtroEstado">
+              <option value="">Todos los estados</option>
+              <option value="Vigente">Vigente</option>
+              <option value="ProximoAVencer">Próximo a vencer</option>
+              <option value="FueraDeNorma">Fuera de norma</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- TABLA -->
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>N° de serie</th>
+              <th>Tipo</th>
+              <th>Capacidad (kg)</th>
+              <th>ID Cliente</th>
+              <th>Vencimiento</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of extintoresFiltrados">
+              <td>{{ e.nroSerie }}</td>
+              <td>{{ e.tipoAgente }}</td>
+              <td>{{ e.capacidad }}</td>
+              <td>{{ e.clienteId }}</td>
+              <td>{{ e.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="badge" [ngClass]="obtenerClaseEstado(e)">
+                  {{ obtenerTextoEstado(e) }}
+                </span>
+              </td>
+              <td class="d-flex gap-1">
+                <button class="btn btn-info btn-sm" (click)="verHojaDeVida(e)">Hoja de vida</button>
+                <button *ngIf="esAdmin" class="btn btn-danger btn-sm" (click)="eliminarExtintor(e.id)">Eliminar</button>
+              </td>
+            </tr>
+            <tr *ngIf="extintoresFiltrados.length === 0">
+              <td colspan="7" class="text-center text-muted">No hay extintores registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOJA DE VIDA -->
+  <div *ngIf="mostrarHojaDeVida && extintorSeleccionado">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Hoja de vida — {{ extintorSeleccionado.nroSerie }}</h5>
+        <button class="btn btn-secondary btn-sm" (click)="volver()">Volver</button>
+      </div>
+      <div class="card-body">
+
+        <!-- DATOS DEL EXTINTOR -->
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <strong>Tipo de agente:</strong> {{ extintorSeleccionado.tipoAgente }}
+          </div>
+          <div class="col-md-3">
+            <strong>Capacidad:</strong> {{ extintorSeleccionado.capacidad }} kg
+          </div>
+          <div class="col-md-3">
+            <strong>Vencimiento:</strong> {{ extintorSeleccionado.fechaVencimiento | date:'dd/MM/yyyy' }}
+          </div>
+          <div class="col-md-3">
+            <strong>Estado:</strong>
+            <span class="badge ms-1" [ngClass]="obtenerClaseEstado(extintorSeleccionado)">
+              {{ obtenerTextoEstado(extintorSeleccionado) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- FORMULARIO RECARGA -->
+        <div *ngIf="esAdmin">
+          <button class="btn btn-primary btn-sm mb-3" (click)="mostrarFormRecarga = !mostrarFormRecarga">
+            + Agregar recarga
+          </button>
+          <div *ngIf="mostrarFormRecarga" class="border rounded p-3 mb-3 bg-light">
+            <h6>Nueva recarga</h6>
+            <div class="row g-2">
+              <div class="col-md-3">
+                <input class="form-control" placeholder="Agente usado" [(ngModel)]="nuevaRecarga.agenteUsado" />
+              </div>
+              <div class="col-md-2">
+                <input class="form-control" type="number" placeholder="Cantidad (kg)" [(ngModel)]="nuevaRecarga.cantidadKg" />
+              </div>
+              <div class="col-md-2">
+                <input class="form-control" type="number" placeholder="ID insumo" [(ngModel)]="nuevaRecarga.insumoId" />
+              </div>
+              <div class="col-md-3">
+                <input class="form-control" placeholder="Técnico" [(ngModel)]="nuevaRecarga.tecnico" />
+              </div>
+              <div class="col-md-3">
+                <input class="form-control" placeholder="Observaciones" [(ngModel)]="nuevaRecarga.observaciones" />
+              </div>
+              <div class="col-md-3 d-flex gap-2">
+                <button class="btn btn-success btn-sm" (click)="guardarRecarga()">Guardar</button>
+                <button class="btn btn-secondary btn-sm" (click)="mostrarFormRecarga = false; nuevaRecarga = {}">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIAL DE RECARGAS -->
+        <h6>Historial de recargas</h6>
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>Fecha</th>
+              <th>Agente</th>
+              <th>Cantidad (kg)</th>
+              <th>Técnico</th>
+              <th>Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of extintorSeleccionado.hojaDeVida.recargas">
+              <td>{{ r.fecha | date:'dd/MM/yyyy' }}</td>
+              <td>{{ r.agenteUsado }}</td>
+              <td>{{ r.cantidadKg }}</td>
+              <td>{{ r.tecnico }}</td>
+              <td>{{ r.observaciones }}</td>
+            </tr>
+            <tr *ngIf="extintorSeleccionado.hojaDeVida.recargas.length === 0">
+              <td colspan="5" class="text-center text-muted">Sin recargas registradas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

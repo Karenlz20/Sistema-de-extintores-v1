@@ -3,7 +3,7 @@ namespace SistemaExtintores.Modelos
     public class ClienteEmpresa : Cliente
     {
         public string RazonSocial { get; set; }
-        public string NIT { get; set; }
+        public string Nit { get; set; }
         public string NombreContacto { get; set; }
         public List<Sucursal> Sucursales { get; set; } = new List<Sucursal>();
 
@@ -13,7 +13,7 @@ namespace SistemaExtintores.Modelos
         {
             Id = id;
             RazonSocial = razonSocial;
-            NIT = nit;
+            Nit = nit;
             NombreContacto = nombreContacto;
             Telefono = telefono;
             Correo = correo;
@@ -23,6 +23,6 @@ namespace SistemaExtintores.Modelos
         public void AgregarSucursal(Sucursal sucursal) { Sucursales.Add(sucursal); }
 
         public override string ObtenerNombreCompleto() { return RazonSocial; }
-        public override string ObtenerDocumento() { return "NIT: " + NIT; }
+        public override string ObtenerDocumento() { return "Nit: " + Nit; }
     }
 }

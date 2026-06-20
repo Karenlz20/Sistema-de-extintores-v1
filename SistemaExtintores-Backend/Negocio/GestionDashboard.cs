@@ -76,7 +76,7 @@ namespace SistemaExtintores.Negocio
             foreach (KeyValuePair<int, ClienteUrgenteDto> par in agrupados)
                 lista.Add(par.Value);
 
-            // Bubble sort por fecha de vencimiento más próxima
+            //fecha de vencimiento más próxima
             for (int i = 0; i < lista.Count - 1; i++)
             {
                 for (int j = 0; j < lista.Count - i - 1; j++)

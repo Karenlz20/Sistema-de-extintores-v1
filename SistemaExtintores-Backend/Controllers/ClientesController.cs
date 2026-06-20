@@ -60,7 +60,7 @@ public class ClientesController : ControllerBase
         return Ok(new { Mensaje = "Cliente dado de baja correctamente." });
     }
 
-    // ── Sucursales (HU-06) ──
+    //Sucursales
 
     [HttpPost("agregar-sucursal/{empresaId}")]
     public object AgregarSucursal(int empresaId, [FromBody] Sucursal sucursal)

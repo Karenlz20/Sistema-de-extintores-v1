@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExtintoresService } from './extintores.service';
 import { Extintor, Recarga, EstadoVigencia, Usuario, RolUsuario } from '../modelos/modelos';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-extintores',
@@ -33,7 +33,7 @@ export class Extintores implements OnInit {
 
   mensaje = '';
 
-  constructor(private extintoresService: ExtintoresService, private router: Router) {}
+  constructor(private extintoresService: ExtintoresService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit() {
     const raw = localStorage.getItem('usuario');
@@ -43,12 +43,22 @@ export class Extintores implements OnInit {
     }
     this.usuario = JSON.parse(raw);
     this.esAdmin = this.usuario?.rol === RolUsuario.Administrador;
-    this.cargarExtintores();
+    const nroSerieParam = this.route.snapshot.queryParamMap.get('nroSerie');
+    if (nroSerieParam) this.filtroSerie = nroSerieParam;
+    this.cargarExtintores(nroSerieParam);
   }
 
-  cargarExtintores() {
+  cargarExtintores(autoAbrirNroSerie: string | null = null) {
     this.extintoresService.listaExtintores().subscribe(data => {
       this.extintores = data;
+      if (autoAbrirNroSerie) {
+        for (const e of data) {
+          if (e.nroSerie === autoAbrirNroSerie) {
+            this.verHojaDeVida(e);
+            break;
+          }
+        }
+      }
     });
   }
 

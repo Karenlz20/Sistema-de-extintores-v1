@@ -21,7 +21,90 @@
 
     @if (extintores.length === 0) {
       <p class="text-muted">Este cliente no tiene extintores registrados.</p>
+    } @else if (esEmpresa() && cliente.sucursales?.length > 0) {
+      <!-- EMPRESA: agrupado por sucursal -->
+      @for (s of cliente.sucursales; track s.id) {
+        <div class="card mb-3">
+          <div class="card-header bg-light">
+            <strong>{{ s.nombre }}</strong>
+            <span class="text-muted ms-2 small">{{ s.direccion }} · {{ s.telefono }}</span>
+            <span class="badge bg-primary float-end">{{ extintoresDeSucursal(s.id).length }} extintor(es)</span>
+          </div>
+          <div class="card-body p-0">
+            @if (extintoresDeSucursal(s.id).length === 0) {
+              <p class="text-muted m-3">Sin extintores asignados a esta sucursal.</p>
+            } @else {
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>N° Serie</th>
+                    <th>Tipo</th>
+                    <th>Capacidad</th>
+                    <th>Vencimiento</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (e of extintoresDeSucursal(s.id); track e.id) {
+                    <tr>
+                      <td>{{ e.nroSerie }}</td>
+                      <td>{{ e.tipoAgente }}</td>
+                      <td>{{ e.capacidad }} kg</td>
+                      <td>{{ e.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+                      <td>
+                        <span class="badge {{ obtenerEstadoBadge(e.estadoVigencia ?? e.estado) }}">
+                          {{ e.estadoVigencia ?? e.estado }}
+                        </span>
+                      </td>
+                      <td>
+                        <button class="btn btn-info btn-sm" (click)="verHojaDeVida(e.nroSerie)">Hoja de vida</button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+      }
+      @if (extintoresSinSucursal().length > 0) {
+        <div class="card mb-3 border-warning">
+          <div class="card-header bg-warning-subtle">
+            <strong>Sin sucursal asignada</strong>
+            <span class="badge bg-warning float-end">{{ extintoresSinSucursal().length }}</span>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>N° Serie</th><th>Tipo</th><th>Capacidad</th><th>Vencimiento</th><th>Estado</th><th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (e of extintoresSinSucursal(); track e.id) {
+                  <tr>
+                    <td>{{ e.nroSerie }}</td>
+                    <td>{{ e.tipoAgente }}</td>
+                    <td>{{ e.capacidad }} kg</td>
+                    <td>{{ e.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      <span class="badge {{ obtenerEstadoBadge(e.estadoVigencia ?? e.estado) }}">
+                        {{ e.estadoVigencia ?? e.estado }}
+                      </span>
+                    </td>
+                    <td>
+                      <button class="btn btn-info btn-sm" (click)="verHojaDeVida(e.nroSerie)">Hoja de vida</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
     } @else {
+      <!-- PERSONA: tabla plana -->
       <table class="table table-bordered table-hover">
         <thead class="table-dark">
           <tr>
@@ -30,6 +113,7 @@
             <th>Capacidad</th>
             <th>Vencimiento</th>
             <th>Estado</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -43,6 +127,9 @@
                 <span class="badge {{ obtenerEstadoBadge(e.estadoVigencia ?? e.estado) }}">
                   {{ e.estadoVigencia ?? e.estado }}
                 </span>
+              </td>
+              <td>
+                <button class="btn btn-info btn-sm" (click)="verHojaDeVida(e.nroSerie)">Hoja de vida</button>
               </td>
             </tr>
           }

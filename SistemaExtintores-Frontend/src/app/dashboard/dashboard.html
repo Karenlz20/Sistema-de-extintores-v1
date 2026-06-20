@@ -5,32 +5,120 @@
     <hr />
 
     @if (datos) {
-      <div class="row">
+      <div class="row g-3">
         <div class="col-md-3">
-          <div class="card text-center p-3">
-            <h5>Clientes activos</h5>
-            <h2>{{ datos.clientesActivos }}</h2>
+          <div class="card text-center p-3 border-primary">
+            <h6 class="text-muted">Clientes</h6>
+            <h2>{{ datos.totalClientes }}</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center p-3 border-success">
+            <h6 class="text-muted">Extintores vigentes</h6>
+            <h2 class="text-success">{{ datos.vigentes }}</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center p-3 border-warning">
+            <h6 class="text-muted">Próximos a vencer</h6>
+            <h2 class="text-warning">{{ datos.proximosAVencer }}</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center p-3 border-danger">
+            <h6 class="text-muted">Fuera de norma</h6>
+            <h2 class="text-danger">{{ datos.fueraDeNorma }}</h2>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card text-center p-3">
-            <h5>Extintores vigentes</h5>
-            <h2>{{ datos.extintoresVigentes }}</h2>
+            <h6 class="text-muted">Total extintores</h6>
+            <h2>{{ datos.totalExtintores }}</h2>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card text-center p-3">
-            <h5>Próximos a vencer</h5>
-            <h2>{{ datos.extintoresProximosAVencer }}</h2>
+            <h6 class="text-muted">Cilindros disponibles</h6>
+            <h2>{{ datos.cilindrosDisponibles }}</h2>
           </div>
         </div>
         <div class="col-md-3">
-          <div class="card text-center p-3">
-            <h5>Fuera de norma</h5>
-            <h2>{{ datos.extintoresFueraDeNorma }}</h2>
+          <div class="card text-center p-3" [class.border-danger]="datos.insumosBajoReorden > 0">
+            <h6 class="text-muted">Insumos bajo reorden</h6>
+            <h2 [class.text-danger]="datos.insumosBajoReorden > 0">{{ datos.insumosBajoReorden }}</h2>
           </div>
         </div>
       </div>
     }
+    @if (!datos) {
+      <p class="text-muted">Cargando datos...</p>
+    }
+
+    <div class="row mt-4">
+      <div class="col-md-7">
+        <div class="card">
+          <div class="card-header bg-warning-subtle">
+            <h6 class="mb-0">Clientes con equipos urgentes</h6>
+          </div>
+          <div class="card-body">
+            @if (clientesUrgentes.length === 0) {
+              <p class="text-muted mb-0">Sin clientes con equipos próximos a vencer o fuera de norma.</p>
+            } @else {
+              <table class="table table-sm table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Contacto</th>
+                    <th class="text-center">Equipos urgentes</th>
+                    <th>Más próximo a vencer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (c of clientesUrgentes; track c.clienteId) {
+                    <tr>
+                      <td><strong>{{ c.nombre }}</strong></td>
+                      <td>{{ c.telefono }}</td>
+                      <td class="text-center"><span class="badge bg-danger">{{ c.cantidad }}</span></td>
+                      <td>{{ c.fechaVencimientoMasProxima | date:'dd/MM/yyyy' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="card">
+          <div class="card-header bg-danger-subtle">
+            <h6 class="mb-0">Insumos en punto de reorden</h6>
+          </div>
+          <div class="card-body">
+            @if (insumosReorden.length === 0) {
+              <p class="text-muted mb-0">Todos los insumos tienen stock suficiente.</p>
+            } @else {
+              <table class="table table-sm table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Insumo</th>
+                    <th class="text-end">Stock</th>
+                    <th class="text-end">Reorden</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (i of insumosReorden; track i.id) {
+                    <tr>
+                      <td>{{ i.nombre }}</td>
+                      <td class="text-end text-danger"><strong>{{ i.stock }}</strong> {{ i.unidad }}</td>
+                      <td class="text-end text-muted">{{ i.puntoReorden }} {{ i.unidad }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 }

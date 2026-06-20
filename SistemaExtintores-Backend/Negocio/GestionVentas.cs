@@ -1,82 +1,70 @@
-using System;
-using System.Collections.Generic;
+using SistemaExtintores.Data;
 using SistemaExtintores.Modelos;
 
 namespace SistemaExtintores.Negocio
 {
     public class GestionVentas
     {
-        private static List<Venta> _ventas = new List<Venta>();
-        private static int _contadorId = 1;
-
+        private VentasData _data;
         private GestionInventario _gestionInventario;
         private GestionExtintores _gestionExtintores;
 
         public GestionVentas()
         {
+            _data = new VentasData();
             _gestionInventario = new GestionInventario();
             _gestionExtintores = new GestionExtintores();
         }
 
         public List<Venta> ObtenerTodas()
         {
-            return _ventas;
+            return _data.ObtenerTodas();
         }
 
         public Venta ObtenerPorId(int id)
         {
-            foreach (Venta venta in _ventas)
-            {
-                if (venta.Id == id)
-                    return venta;
-            }
-            return null;
+            return _data.ObtenerPorId(id);
         }
 
         public List<Venta> ObtenerPorCliente(int clienteId)
         {
-            List<Venta> resultado = new List<Venta>();
-            foreach (Venta venta in _ventas)
-            {
-                if (venta.ClienteId == clienteId)
-                    resultado.Add(venta);
-            }
-            return resultado;
+            return _data.ObtenerPorCliente(clienteId);
         }
 
         public List<Venta> ObtenerPorFecha(DateTime desde, DateTime hasta)
         {
-            List<Venta> resultado = new List<Venta>();
-            foreach (Venta venta in _ventas)
-            {
-                if (venta.Fecha >= desde && venta.Fecha <= hasta)
-                    resultado.Add(venta);
-            }
-            return resultado;
+            return _data.ObtenerPorFecha(desde, hasta);
         }
 
         public Venta CrearVenta(Venta venta)
         {
-            venta.Id = _contadorId;
-            _contadorId++;
-            venta.Fecha = DateTime.Now;
+            venta.Fecha  = DateTime.Now;
             venta.Estado = EstadoVenta.Pendiente;
-            _ventas.Add(venta);
-            return venta;
+            venta.NumeroComprobante = "";
+            return _data.InsertarVenta(venta);
         }
 
         public Venta AgregarItem(int ventaId, ItemVenta item)
         {
-            Venta venta = ObtenerPorId(ventaId);
+            Venta venta = _data.ObtenerPorId(ventaId);
             if (venta == null) return null;
             if (venta.Estado != EstadoVenta.Pendiente) return null;
-            venta.AgregarItem(item);
-            return venta;
+            _data.InsertarItem(ventaId, item);
+            return _data.ObtenerPorId(ventaId);
+        }
+
+        public Venta EliminarItem(int ventaId, int itemId)
+        {
+            Venta venta = _data.ObtenerPorId(ventaId);
+            if (venta == null) return null;
+            if (venta.Estado != EstadoVenta.Pendiente) return null;
+            _data.EliminarItem(itemId);
+            return _data.ObtenerPorId(ventaId);
         }
 
         public Venta AplicarDescuento(int ventaId, double porcentaje, int usuarioId)
         {
-            Venta venta = ObtenerPorId(ventaId);
+            Venta venta = _data.ObtenerPorId(ventaId);
             if (venta == null) return null;
             if (venta.Estado != EstadoVenta.Pendiente) return null;
 
@@ -88,16 +76,23 @@ namespace SistemaExtintores.Negocio
                 if (usuario.Rol != RolUsuario.Administrador) return null;
             }
 
+            _data.ActualizarDescuento(ventaId, porcentaje);
             venta.Descuento = porcentaje;
             return venta;
         }
 
-        public Venta ConfirmarVenta(int ventaId, int usuarioId)
+        public Venta ConfirmarVenta(int ventaId, int usuarioId, int clienteId)
         {
-            Venta venta = ObtenerPorId(ventaId);
+            Venta venta = _data.ObtenerPorId(ventaId);
             if (venta == null) return null;
             if (venta.Estado != EstadoVenta.Pendiente) return null;
             if (venta.Items.Count == 0) return null;
+
+            if (clienteId > 0 && clienteId != venta.ClienteId)
+            {
+                _data.ActualizarCliente(ventaId, clienteId);
+                venta.ClienteId = clienteId;
+            }
 
             foreach (ItemVenta item in venta.Items)
             {
@@ -105,22 +100,21 @@ namespace SistemaExtintores.Negocio
                 {
                     ExtintorItem extItem = (ExtintorItem)item;
 
-                    Extintor extintorExistente = _gestionExtintores.ObtenerPorNroSerie(extItem.NroSerie);
-                    if (extintorExistente != null) return null;
+                    if (_gestionExtintores.ObtenerPorNroSerie(extItem.NroSerie) != null) return null;
 
                     CilindroInventario cilindro = _gestionInventario.ObtenerCilindroPorNroSerie(extItem.NroSerie);
                     if (cilindro != null && cilindro.Disponible)
                         _gestionInventario.MarcarVendido(cilindro.Id, usuarioId);
 
                     Extintor nuevoExtintor = new Extintor();
-                    nuevoExtintor.NroSerie = extItem.NroSerie;
-                    nuevoExtintor.TipoAgente = extItem.TipoAgente;
-                    nuevoExtintor.Capacidad = extItem.Capacidad;
-                    nuevoExtintor.FechaFabricacion = DateTime.Now;
-                    nuevoExtintor.FechaUltimaCarga = DateTime.Now;
-                    nuevoExtintor.FechaVencimiento = DateTime.Now.AddYears(1);
-                    nuevoExtintor.ClienteId = venta.ClienteId;
-                    nuevoExtintor.SucursalId = venta.SucursalId;
+                    nuevoExtintor.NroSerie            = extItem.NroSerie;
+                    nuevoExtintor.TipoAgente           = extItem.TipoAgente;
+                    nuevoExtintor.Capacidad            = extItem.Capacidad;
+                    nuevoExtintor.FechaFabricacion     = DateTime.Now;
+                    nuevoExtintor.FechaUltimaCarga     = DateTime.Now;
+                    nuevoExtintor.FechaVencimiento     = DateTime.Now.AddYears(1);
+                    nuevoExtintor.ClienteId            = venta.ClienteId;
+                    nuevoExtintor.SucursalId           = venta.SucursalId;
                     nuevoExtintor.CilindroInventarioId = cilindro != null ? cilindro.Id : (int?)null;
 
                     Extintor agregado = _gestionExtintores.Agregar(nuevoExtintor);
@@ -134,10 +128,10 @@ namespace SistemaExtintores.Negocio
                     if (extintor == null) return null;
 
                     Recarga recarga = new Recarga();
-                    recarga.AgenteUsado = "";
-                    recarga.CantidadKg = item.Cantidad;
-                    recarga.InsumoId = recItem.InsumoId;
-                    recarga.Tecnico = "";
+                    recarga.AgenteUsado   = extintor.TipoAgente;
+                    recarga.CantidadKg    = extintor.Capacidad;
+                    recarga.InsumoId      = recItem.InsumoId;
+                    recarga.Tecnico       = "";
                     recarga.Observaciones = "Recarga via venta " + venta.Id;
 
                     Extintor resultado = _gestionExtintores.AgregarRecarga(extintor.Id, recarga, usuarioId);
@@ -145,17 +139,18 @@ namespace SistemaExtintores.Negocio
                 }
             }
 
-            venta.Estado = EstadoVenta.Confirmada;
             venta.GenerarComprobante();
+            _data.ActualizarEstado(ventaId, EstadoVenta.Confirmada, venta.NumeroComprobante);
+            venta.Estado = EstadoVenta.Confirmada;
             return venta;
         }
 
         public bool AnularVenta(int ventaId)
         {
-            Venta venta = ObtenerPorId(ventaId);
+            Venta venta = _data.ObtenerPorId(ventaId);
             if (venta == null) return false;
             if (venta.Estado == EstadoVenta.Confirmada) return false;
-            venta.Estado = EstadoVenta.Anulada;
+            _data.ActualizarEstado(ventaId, EstadoVenta.Anulada, "");
             return true;
         }
     }

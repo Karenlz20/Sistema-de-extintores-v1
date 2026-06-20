@@ -44,24 +44,64 @@ namespace SistemaExtintores.Negocio
 
         public List<object> ObtenerClientesUrgentes()
         {
-            List<object> resultado = new List<object>();
+            GestionClientes gestionClientes = new GestionClientes();
+            Dictionary<int, ClienteUrgenteDto> agrupados = new Dictionary<int, ClienteUrgenteDto>();
 
             foreach (Extintor e in _gestionExtintores.ObtenerTodos())
             {
-                if (e.ObtenerEstado() != EstadoVigencia.Vigente)
+                EstadoVigencia estado = e.ObtenerEstado();
+                if (estado == EstadoVigencia.Vigente) continue;
+
+                if (!agrupados.ContainsKey(e.ClienteId))
                 {
-                    resultado.Add(new
+                    Cliente c = gestionClientes.ObtenerPorId(e.ClienteId);
+                    if (c == null) continue;
+
+                    ClienteUrgenteDto dto = new ClienteUrgenteDto();
+                    dto.ClienteId = c.Id;
+                    dto.Nombre    = c is ClienteEmpresa ? ((ClienteEmpresa)c).RazonSocial : ((ClientePersona)c).NombreCompleto;
+                    dto.Telefono  = c.Telefono;
+                    dto.Cantidad  = 0;
+                    dto.FechaVencimientoMasProxima = e.FechaVencimiento;
+                    agrupados[e.ClienteId] = dto;
+                }
+
+                ClienteUrgenteDto urgente = agrupados[e.ClienteId];
+                urgente.Cantidad++;
+                if (e.FechaVencimiento < urgente.FechaVencimientoMasProxima)
+                    urgente.FechaVencimientoMasProxima = e.FechaVencimiento;
+            }
+
+            List<ClienteUrgenteDto> lista = new List<ClienteUrgenteDto>();
+            foreach (KeyValuePair<int, ClienteUrgenteDto> par in agrupados)
+                lista.Add(par.Value);
+
+            // Bubble sort por fecha de vencimiento más próxima
+            for (int i = 0; i < lista.Count - 1; i++)
+            {
+                for (int j = 0; j < lista.Count - i - 1; j++)
+                {
+                    if (lista[j].FechaVencimientoMasProxima > lista[j + 1].FechaVencimientoMasProxima)
                     {
-                        ExtintorId = e.Id,
-                        NroSerie = e.NroSerie,
-                        Estado = e.ObtenerEstado().ToString(),
-                        ClienteId = e.ClienteId,
-                        FechaVencimiento = e.FechaVencimiento
-                    });
+                        ClienteUrgenteDto temp = lista[j];
+                        lista[j] = lista[j + 1];
+                        lista[j + 1] = temp;
+                    }
                 }
             }
 
+            List<object> resultado = new List<object>();
+            foreach (ClienteUrgenteDto u in lista) resultado.Add(u);
             return resultado;
         }
+    }
+
+    public class ClienteUrgenteDto
+    {
+        public int ClienteId { get; set; }
+        public string Nombre { get; set; }
+        public string Telefono { get; set; }
+        public int Cantidad { get; set; }
+        public DateTime FechaVencimientoMasProxima { get; set; }
     }
 }

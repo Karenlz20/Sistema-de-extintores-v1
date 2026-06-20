@@ -37,12 +37,16 @@ export class VentasService {
     return this.api.post<Venta>(`${BASE}/agregar-item-recarga/${ventaId}`, item);
   }
 
+  eliminarItem(ventaId: number, itemId: number): Observable<Venta> {
+    return this.api.delete<Venta>(`${BASE}/eliminar-item/${ventaId}/${itemId}`);
+  }
+
   aplicarDescuento(ventaId: number, usuarioId: number, porcentaje: number): Observable<Venta> {
     return this.api.put<Venta>(`${BASE}/aplicar-descuento/${ventaId}/${usuarioId}`, porcentaje);
   }
 
-  confirmarVenta(ventaId: number, usuarioId: number): Observable<Venta> {
-    return this.api.put<Venta>(`${BASE}/confirmar-venta/${ventaId}/${usuarioId}`, {});
+  confirmarVenta(ventaId: number, usuarioId: number, clienteId: number): Observable<Venta> {
+    return this.api.put<Venta>(`${BASE}/confirmar-venta/${ventaId}/${usuarioId}/${clienteId}`, {});
   }
 
   anularVenta(ventaId: number): Observable<boolean> {

@@ -7,16 +7,18 @@ namespace SistemaExtintores.Modelos
         public string Unidad { get; set; }
         public double Stock { get; set; }
         public double PuntoReorden { get; set; }
+        public bool EsPresurizante { get; set; }
 
         public InsumoInventario() { }
 
-        public InsumoInventario(int id, string nombre, string unidad, double stock, double puntoReorden)
+        public InsumoInventario(int id, string nombre, string unidad, double stock, double puntoReorden, bool esPresurizante = false)
         {
             Id = id;
             Nombre = nombre;
             Unidad = unidad;
             Stock = stock;
             PuntoReorden = puntoReorden;
+            EsPresurizante = esPresurizante;
         }
 
         public bool RequiereReorden() { return Stock <= PuntoReorden; }

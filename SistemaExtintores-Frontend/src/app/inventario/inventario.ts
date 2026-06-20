@@ -94,6 +94,18 @@ export class Inventario implements OnInit {
   guardarCilindro() {
     if (!this.usuario) return;
     const cilindro = this.nuevoCilindro as CilindroInventario;
+    if (!cilindro.nroSerie || !cilindro.tipoAgente) {
+      this.mensaje = 'Complete N° de serie y tipo de agente.';
+      return;
+    }
+    if (cilindro.capacidad == null || cilindro.capacidad <= 0) {
+      this.mensaje = 'La capacidad debe ser mayor a 0.';
+      return;
+    }
+    if (cilindro.precioUnitario == null || cilindro.precioUnitario < 0) {
+      this.mensaje = 'El precio no puede ser negativo.';
+      return;
+    }
     cilindro.disponible = true;
     this.inventarioService.agregarCilindro(this.usuario.id, cilindro).subscribe(result => {
       if (result) {
@@ -117,6 +129,18 @@ export class Inventario implements OnInit {
   guardarInsumo() {
     if (!this.usuario) return;
     const insumo = this.nuevoInsumo as InsumoInventario;
+    if (!insumo.nombre || !insumo.unidad) {
+      this.mensaje = 'Complete nombre y unidad.';
+      return;
+    }
+    if (insumo.stock == null || insumo.stock < 0) {
+      this.mensaje = 'El stock inicial no puede ser negativo.';
+      return;
+    }
+    if (insumo.puntoReorden == null || insumo.puntoReorden < 0) {
+      this.mensaje = 'El punto de reorden no puede ser negativo.';
+      return;
+    }
     this.inventarioService.agregarInsumo(this.usuario.id, insumo).subscribe(result => {
       if (result) {
         this.mensaje = 'Insumo agregado correctamente.';
@@ -138,6 +162,14 @@ export class Inventario implements OnInit {
 
   guardarIngreso() {
     if (!this.usuario) return;
+    if (!this.insumoSeleccionadoId) {
+      this.mensaje = 'Seleccione un insumo.';
+      return;
+    }
+    if (this.cantidadIngreso == null || this.cantidadIngreso <= 0) {
+      this.mensaje = 'La cantidad ingresada debe ser mayor a 0.';
+      return;
+    }
     this.inventarioService.registrarIngresoInsumo(
       this.insumoSeleccionadoId,
       this.usuario.id,

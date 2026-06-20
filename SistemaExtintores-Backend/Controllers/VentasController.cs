@@ -57,16 +57,22 @@ public class VentasController : ControllerBase
         return _gestionVentas.AgregarItem(ventaId, item);
     }
 
+    [HttpDelete("eliminar-item/{ventaId}/{itemId}")]
+    public Venta EliminarItem(int ventaId, int itemId)
+    {
+        return _gestionVentas.EliminarItem(ventaId, itemId);
+    }
+
     [HttpPut("aplicar-descuento/{ventaId}/{usuarioId}")]
     public Venta AplicarDescuento(int ventaId, int usuarioId, [FromBody] double porcentaje)
     {
         return _gestionVentas.AplicarDescuento(ventaId, porcentaje, usuarioId);
     }
 
-    [HttpPut("confirmar-venta/{ventaId}/{usuarioId}")]
-    public IActionResult ConfirmarVenta(int ventaId, int usuarioId)
+    [HttpPut("confirmar-venta/{ventaId}/{usuarioId}/{clienteId}")]
+    public IActionResult ConfirmarVenta(int ventaId, int usuarioId, int clienteId)
     {
-        Venta venta = _gestionVentas.ConfirmarVenta(ventaId, usuarioId);
+        Venta venta = _gestionVentas.ConfirmarVenta(ventaId, usuarioId, clienteId);
         if (venta == null) return BadRequest("No se pudo confirmar la venta. Verifique que tenga items y que los N° de serie no estén duplicados.");
         return Ok(venta);
     }

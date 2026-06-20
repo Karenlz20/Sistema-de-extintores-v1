@@ -28,7 +28,7 @@
               <input class="form-control" placeholder="Tipo de agente" [(ngModel)]="nuevoExtintor.tipoAgente" />
             </div>
             <div class="col-md-2">
-              <input class="form-control" type="number" placeholder="Capacidad (kg)" [(ngModel)]="nuevoExtintor.capacidad" />
+              <input class="form-control" type="number" min="0" placeholder="Capacidad (kg)" [(ngModel)]="nuevoExtintor.capacidad" />
             </div>
             <div class="col-md-2">
               <input class="form-control" type="number" placeholder="ID cliente" [(ngModel)]="nuevoExtintor.clienteId" />
@@ -149,7 +149,7 @@
                 <input class="form-control" placeholder="Agente usado" [(ngModel)]="nuevaRecarga.agenteUsado" />
               </div>
               <div class="col-md-2">
-                <input class="form-control" type="number" placeholder="Cantidad (kg)" [(ngModel)]="nuevaRecarga.cantidadKg" />
+                <input class="form-control" type="number" min="0" placeholder="Cantidad (kg)" [(ngModel)]="nuevaRecarga.cantidadKg" />
               </div>
               <div class="col-md-2">
                 <input class="form-control" type="number" placeholder="ID insumo" [(ngModel)]="nuevaRecarga.insumoId" />

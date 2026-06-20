@@ -44,10 +44,12 @@ public class ClientesController : ControllerBase
     {
         Cliente existente = _gestionClientes.ObtenerPorId(id);
         if (existente == null) return BadRequest("Cliente no encontrado.");
-        existente.Telefono = datos.Telefono;
-        existente.Correo = datos.Correo;
+        existente.Telefono  = datos.Telefono;
+        existente.Correo    = datos.Correo;
         existente.Direccion = datos.Direccion;
-        return Ok(existente);
+        Cliente actualizado = _gestionClientes.Actualizar(id, existente);
+        if (actualizado == null) return BadRequest("No se pudo actualizar el cliente.");
+        return Ok(actualizado);
     }
 
     [HttpDelete("eliminar-cliente/{id}")]

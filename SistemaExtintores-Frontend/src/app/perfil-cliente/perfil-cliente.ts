@@ -35,6 +35,26 @@ export class PerfilCliente implements OnInit {
 
   esEmpresa() { return this.cliente?.nit !== undefined; }
 
+  extintoresDeSucursal(sucursalId: number): any[] {
+    const resultado: any[] = [];
+    for (const e of this.extintores) {
+      if (e.sucursalId === sucursalId) resultado.push(e);
+    }
+    return resultado;
+  }
+
+  extintoresSinSucursal(): any[] {
+    const resultado: any[] = [];
+    for (const e of this.extintores) {
+      if (!e.sucursalId) resultado.push(e);
+    }
+    return resultado;
+  }
+
+  verHojaDeVida(nroSerie: string) {
+    this.router.navigate(['/extintores'], { queryParams: { nroSerie } });
+  }
+
   obtenerEstadoBadge(estado: string) {
     if (estado === 'Vigente') return 'bg-success';
     if (estado === 'ProximoAVencer') return 'bg-warning text-dark';

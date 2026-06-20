@@ -47,6 +47,7 @@ export interface InsumoInventario {
   unidad: string;
   stock: number;
   puntoReorden: number;
+  esPresurizante: boolean;
 }
 
 export interface MovimientoInventario {
